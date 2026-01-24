@@ -201,3 +201,514 @@ table {
     border: 1px solid #cfcfcf;
     color: #222;
 }
+
+/* Watched Page */
+.page-watched{
+    padding: 12px 12px 0;
+}
+
+.watched-header{
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 10px;
+}
+
+.watched-title{
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.watched-top{
+    border-top: 1px solid #e9e9e9;
+    padding-top: 10px;
+    margin-top: 2px;
+}
+
+.watched-subtitle{
+    margin: 0 0 10px;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.watched-filter{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.watched-filter-label{
+    font-size: 13px;
+    font-weight: 800;
+    color: #444;
+    white-space: nowrap;
+}
+
+.watched-filter-chips{
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.chip{
+    height: 28px;
+    padding: 0 10px;
+    border-radius: 999px;
+    border: 1px solid #cfcfcf;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 800;
+    color: #444;
+}
+
+.chip.is-active{
+    background: #efefef;
+}
+
+/* List */
+.watched-list{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 0 12px;
+}
+
+.watched-card{
+    display: grid;
+    grid-template-columns: 78px 1fr;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.watched-thumb{
+    width: 78px;
+    height: 104px;
+    border: 1px solid #cfcfcf;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f4f4f4 0%, #eaeaea 100%);
+}
+
+.watched-body{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+}
+
+.watched-movie-title{
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.watched-movie-meta{
+    margin: 0;
+    font-size: 12px;
+    color: #777;
+}
+
+.watched-actions{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+    flex: 0 0 auto;
+}
+/* Watchlist Page */
+.page-watchlist{
+    padding: 12px 12px 0;
+}
+
+.watchlist-header{
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 10px;
+}
+
+.watchlist-title{
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.watchlist-top{
+    border-top: 1px solid #e9e9e9;
+    padding-top: 10px;
+    margin-top: 2px;
+}
+
+.watchlist-subtitle{
+    margin: 0 0 10px;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.watchlist-filter{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.watchlist-filter-label{
+    font-size: 13px;
+    font-weight: 800;
+    color: #444;
+    white-space: nowrap;
+}
+
+.watchlist-filter-chips{
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+/* List */
+.watchlist-list{
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 12px 0 12px;
+}
+
+.watchlist-card{
+    display: grid;
+    grid-template-columns: 78px 1fr;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.watchlist-thumb{
+    width: 78px;
+    height: 104px;
+    border: 1px solid #cfcfcf;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f4f4f4 0%, #eaeaea 100%);
+}
+
+.watchlist-body{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+}
+
+.watchlist-text{
+    min-width: 0;
+}
+
+.watchlist-movie-title{
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.watchlist-movie-meta{
+    margin: 0;
+    font-size: 12px;
+    color: #777;
+}
+
+.watchlist-actions{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-end;
+    flex: 0 0 auto;
+}
+/* Stats Page */
+.page-stats{
+    padding: 12px 12px 0;
+}
+
+.stats-header{
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 10px;
+}
+
+.stats-title{
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.stats-top{
+    border-top: 1px solid #e9e9e9;
+    padding-top: 10px;
+    margin-top: 2px;
+}
+
+.stats-subtitle{
+    margin: 0 0 10px;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+.stats-row{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.stats-label{
+    font-size: 13px;
+    font-weight: 800;
+    color: #444;
+    white-space: nowrap;
+}
+
+.stats-select{
+    height: 32px;
+    border: 1px solid #cfcfcf;
+    border-radius: 8px;
+    padding: 0 10px;
+    background: #fff;
+    font-weight: 700;
+    color: #333;
+}
+
+/* Sections */
+.stats-section{
+    padding: 12px 0;
+    border-bottom: 1px solid #efefef;
+}
+
+.stats-section-title{
+    margin: 0 0 10px;
+    font-size: 14px;
+    font-weight: 900;
+    color: #222;
+}
+
+/* Chart placeholder */
+.chart-box{
+    width: 100%;
+    height: 180px;   /* 막대차트용 */
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    background: #fff;
+}
+
+.chart-box--pie{
+    height: 220px;   /* 파이차트용 */
+}
+
+/* Legend */
+.genre-legend{
+    list-style: none;
+    padding: 10px 0 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.genre-item{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #444;
+}
+
+.genre-item .dot{
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #bdbdbd;
+}
+
+/* Footer */
+.stats-footer{
+    padding: 12px 0 12px;
+}
+
+.avg-rating{
+    margin: 0;
+    font-size: 14px;
+    font-weight: 800;
+    color: #222;
+}
+
+.avg-rating .star{
+    margin: 0 4px;
+}
+/* Review Editor Page */
+.page-review-editor{
+    padding: 0 12px 12px;
+}
+
+/* Topbar */
+.review-topbar{
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    height: 48px;
+    display: grid;
+    grid-template-columns: 44px 1fr 64px;
+    align-items: center;
+    background: #fff;
+    border-bottom: 1px solid #e9e9e9;
+}
+
+.review-topbar-title{
+    margin: 0;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 900;
+}
+
+.icon-btn{
+    width: 36px;
+    height: 36px;
+    border: 0;
+    background: transparent;
+    font-size: 18px;
+}
+
+.topbar-save{
+    justify-self: end;
+    height: 28px;
+    padding: 0 10px;
+    border: 1px solid #cfcfcf;
+    border-radius: 8px;
+    background: #e9e9e9;
+    font-weight: 800;
+}
+
+/* Movie header */
+.review-movie{
+    display: grid;
+    grid-template-columns: 78px 1fr;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #efefef;
+}
+
+.review-poster{
+    width: 78px;
+    height: 104px;
+    border: 1px solid #cfcfcf;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #f4f4f4 0%, #eaeaea 100%);
+}
+
+.review-movie-body{
+    min-width: 0;
+}
+
+.review-movie-title{
+    margin: 0 0 6px;
+    font-size: 16px;
+    font-weight: 900;
+}
+
+.review-movie-sub{
+    margin: 0 0 10px;
+    font-size: 13px;
+    color: #666;
+}
+
+/* Stars */
+.review-stars{
+    display: flex;
+    gap: 6px;
+}
+
+.star{
+    border: 0;
+    background: transparent;
+    font-size: 18px;
+    padding: 0;
+    opacity: 0.35;
+}
+
+.star.is-on{
+    opacity: 1;
+}
+
+/* Sections */
+.review-section{
+    padding: 12px 0;
+    border-bottom: 1px solid #efefef;
+}
+
+.review-section-title{
+    margin: 0 0 10px;
+    font-size: 13px;
+    font-weight: 900;
+    color: #222;
+}
+
+/* Textarea */
+.review-textbox{
+    border: 1px solid #cfcfcf;
+    border-radius: 10px;
+    background: #fff;
+    padding: 10px;
+}
+
+.review-textarea{
+    width: 100%;
+    border: 0;
+    outline: none;
+    resize: none;
+    font-size: 14px;
+}
+
+/* Tags */
+.tag-add-row{
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.tag-chips{
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.chip-sub{
+    margin-left: 6px;
+    font-weight: 700;
+    opacity: 0.8;
+}
+
+/* Footer */
+.review-footer{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    padding-top: 12px;
+}
+
+.footer-btn{
+    height: 40px;
+}
+
+.footer-btn--primary{
+    background: #bdbdbd;
+}

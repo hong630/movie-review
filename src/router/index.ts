@@ -3,6 +3,7 @@ import SearchPage from "@/pages/SearchPage.vue";
 import WatchlistPage from "@/pages/WatchlistPage.vue";
 import WatchedPage from "@/pages/WatchedPage.vue";
 import StatsPage from "@/pages/StatsPage.vue";
+import ReviewEditorPage from "@/pages/ReviewEditorPage.vue";
 
 
 const routes: RouteRecordRaw[] = [
@@ -11,6 +12,7 @@ const routes: RouteRecordRaw[] = [
     { path: '/watchlist', component: WatchlistPage },
     { path: '/watched', component: WatchedPage },
     { path: '/stats', component: StatsPage },
+    { path: '/movie/:movieId/review', component: ReviewEditorPage },
 ];
 
 export const router = createRouter({
