@@ -39,7 +39,7 @@
         <div class="movie-body">
           <h2 class="movie-title">{{ m.title }}</h2>
           <p class="movie-meta">{{ yearOf(m.release_date) }} | ★ {{ formatScore(m.vote_average) }}</p>
-          <p class="movie-desc">{{ m.overview || '줄거리 정보가 없당 🐹' }}</p>
+          <p class="movie-desc">{{ m.overview || '줄거리 정보가 없음' }}</p>
 
           <div class="movie-actions">
             <button class="btn btn-outline" type="button" @click="onAddWatchlist(m)">+ 볼 영화</button>
@@ -140,7 +140,7 @@ class SearchPage extends Vue {
       releaseDate: m.release_date || null,
       genres: m.genre_ids || [],
     });
-    alert('볼 영화에 추가했어! 🐹');
+    alert('볼 영화에 추가했어요!');
   }
 
   async onAddWatched(m: TmdbMovie & { genre_ids?: number[] }) {
@@ -151,7 +151,7 @@ class SearchPage extends Vue {
       releaseDate: m.release_date || null,
       genres: m.genre_ids || [],
     });
-    alert('본 영화에 추가했어! 🐹');
+    alert('본 영화에 추가완료!');
   }
 
   onGoReview(m: TmdbMovie) {

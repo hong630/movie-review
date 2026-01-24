@@ -48,7 +48,6 @@ class WatchlistPage extends Vue {
   async onMoveToWatched(movieId: number) {
     await moveToWatched(movieId);
     await this.reload();
-    alert('본 영화로 이동! 🐹');
   }
 
   async onRemove(movieId: number) {

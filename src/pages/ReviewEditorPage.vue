@@ -126,7 +126,7 @@ class ReviewEditorPage extends Vue {
       rating: this.rating,
       review: this.review,
     });
-    alert('저장 완료! 🐹');
+    alert('저장 완료!');
     this.router.back();
   }
 
