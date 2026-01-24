@@ -19,10 +19,10 @@
 </template>
 
 <script lang="ts">
-import { Component } from 'vue-facing-decorator';
+import {Component, Vue} from 'vue-facing-decorator';
 
 @Component({ name: 'BottomTabBar' })
-class BottomTabBar {}
+class BottomTabBar extends Vue {}
 export default BottomTabBar;
 </script>
 

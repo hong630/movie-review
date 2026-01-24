@@ -8,21 +8,16 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
 import BottomTabBar from '@/components/layout/BottomTabBar.vue';
-
-export default defineComponent({
-  name: 'App',
-  components: {
-    BottomTabBar,
-  },
-});
 </script>
 
 <style scoped>
 .app-shell {
   min-height: 100vh;
+  width: 100vw;
+  height: 100vh;
+  background-color: #E8E2D8;
 }
 
 .app-main {
