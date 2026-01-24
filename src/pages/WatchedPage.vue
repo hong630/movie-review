@@ -5,7 +5,7 @@
     </header>
 
     <section class="watched-list">
-      <p v-if="!items.length" class="list-empty">아직 본 영화가 없어 🥹</p>
+      <p v-if="!items.length" class="list-empty">아직 본 영화가 없어요 </p>
 
       <article v-for="x in items" :key="x.movieId" class="watched-card">
         <div class="watched-thumb" aria-hidden="true">

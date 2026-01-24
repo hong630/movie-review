@@ -5,7 +5,7 @@
     </header>
 
     <section class="watchlist-list">
-      <p v-if="!items.length" class="list-empty">아직 담은 영화가 없어 🥹</p>
+      <p v-if="!items.length" class="list-empty">아직 담은 영화가 없어</p>
 
       <article v-for="x in items" :key="x.movieId" class="watchlist-card">
         <div class="watchlist-thumb" aria-hidden="true">

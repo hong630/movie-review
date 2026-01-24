@@ -29,7 +29,7 @@
     <!-- 결과 -->
     <section class="search-results">
       <p v-if="loading" class="search-loading">불러오는 중...</p>
-      <p v-else-if="!movies.length" class="search-empty">결과가 없어 🥹</p>
+      <p v-else-if="!movies.length" class="search-empty">결과가 없어요</p>
 
       <article v-for="m in movies" :key="m.id" class="movie-card">
         <div class="movie-thumb" aria-hidden="true">
