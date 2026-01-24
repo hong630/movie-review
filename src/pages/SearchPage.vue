@@ -42,8 +42,8 @@
           <p class="movie-desc">{{ m.overview || '줄거리 정보가 없당 🐹' }}</p>
 
           <div class="movie-actions">
-            <button class="btn btn-outline" type="button">+ 볼 영화</button>
-            <button class="btn btn-outline" type="button">+ 본 영화</button>
+            <button class="btn btn-outline" type="button" @click="onAddWatchlist(m)">+ 볼 영화</button>
+            <button class="btn btn-outline" type="button" @click="onAddWatched(m)">+ 본 영화</button>
             <button class="btn btn-solid" type="button">리뷰</button>
           </div>
         </div>
@@ -55,6 +55,7 @@
 <script lang="ts">
 import { Component, toNative, Vue } from 'vue-facing-decorator';
 import { trendingMovies, searchMovies } from '@/services/tmdb.ts';
+import {addToWatchlist, markWatched} from "@/services/userMovieStore.ts";
 
 type TmdbMovie = {
   id: number;
@@ -129,6 +130,28 @@ class SearchPage extends Vue {
   formatScore(v: number) {
     if (typeof v !== 'number') return '-';
     return v.toFixed(1);
+  }
+
+  async onAddWatchlist(m: any) {
+    await addToWatchlist({
+      movieId: m.id,
+      title: m.title,
+      posterPath: m.poster_path || null,
+      releaseDate: m.release_date || null,
+      genres: m.genre_ids || [],
+    });
+    alert('볼 영화에 추가했어! 🐹');
+  }
+
+  async onAddWatched(m: any) {
+    await markWatched({
+      movieId: m.id,
+      title: m.title,
+      posterPath: m.poster_path || null,
+      releaseDate: m.release_date || null,
+      genres: m.genre_ids || [],
+    });
+    alert('본 영화에 추가했어! 🐹');
   }
 }
 

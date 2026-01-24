@@ -1,86 +1,26 @@
 <template>
   <div class="page-watchlist">
-    <!-- 상단 타이틀 -->
     <header class="watchlist-header">
       <h1 class="watchlist-title">볼 영화</h1>
     </header>
 
-    <!-- 서브 타이틀 + 필터 -->
-    <section class="watchlist-top">
-      <h2 class="watchlist-subtitle">나의 볼 영화</h2>
-
-      <div class="watchlist-filter">
-        <span class="watchlist-filter-label">장르:</span>
-        <div class="watchlist-filter-chips">
-          <button class="chip is-active" type="button">수거운</button>
-          <button class="chip" type="button">찡찡신</button>
-          <button class="chip" type="button">개봉일</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- 리스트 -->
     <section class="watchlist-list">
-      <article class="watchlist-card">
-        <div class="watchlist-thumb" aria-hidden="true"></div>
+      <p v-if="!items.length" class="list-empty">아직 담은 영화가 없어 🥹</p>
 
-        <div class="watchlist-body">
-          <div class="watchlist-text">
-            <h3 class="watchlist-movie-title">영화 제목</h3>
-            <p class="watchlist-movie-meta">개봉 연도</p>
-          </div>
-
-          <div class="watchlist-actions">
-            <button class="btn btn-solid" type="button">볼거예요</button>
-            <button class="btn btn-outline" type="button">메모</button>
-          </div>
+      <article v-for="x in items" :key="x.movieId" class="watchlist-card">
+        <div class="watchlist-thumb" aria-hidden="true">
+          <img v-if="posterUrl(x.posterPath)" class="movie-thumb-img" :src="posterUrl(x.posterPath)" :alt="x.title" />
         </div>
-      </article>
-
-      <article class="watchlist-card">
-        <div class="watchlist-thumb" aria-hidden="true"></div>
 
         <div class="watchlist-body">
           <div class="watchlist-text">
-            <h3 class="watchlist-movie-title">영화 제목</h3>
-            <p class="watchlist-movie-meta">개봉 연도</p>
+            <h3 class="watchlist-movie-title">{{ x.title }}</h3>
+            <p class="watchlist-movie-meta">{{ yearOf(x.releaseDate) }}</p>
           </div>
 
           <div class="watchlist-actions">
-            <button class="btn btn-solid" type="button">볼거예요</button>
-            <button class="btn btn-outline" type="button">메모</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="watchlist-card">
-        <div class="watchlist-thumb" aria-hidden="true"></div>
-
-        <div class="watchlist-body">
-          <div class="watchlist-text">
-            <h3 class="watchlist-movie-title">영화 제목</h3>
-            <p class="watchlist-movie-meta">개봉 연도</p>
-          </div>
-
-          <div class="watchlist-actions">
-            <button class="btn btn-solid" type="button">볼거예요</button>
-            <button class="btn btn-outline" type="button">메모</button>
-          </div>
-        </div>
-      </article>
-
-      <article class="watchlist-card">
-        <div class="watchlist-thumb" aria-hidden="true"></div>
-
-        <div class="watchlist-body">
-          <div class="watchlist-text">
-            <h3 class="watchlist-movie-title">영화 제목</h3>
-            <p class="watchlist-movie-meta">개봉 연도</p>
-          </div>
-
-          <div class="watchlist-actions">
-            <button class="btn btn-solid" type="button">볼거예요</button>
-            <button class="btn btn-outline" type="button">메모</button>
+            <button class="btn btn-solid" type="button" @click="onMoveToWatched(x.movieId)">봤어요</button>
+            <button class="btn btn-outline" type="button" @click="onRemove(x.movieId)">삭제</button>
           </div>
         </div>
       </article>
@@ -90,9 +30,42 @@
 
 <script lang="ts">
 import { Component, toNative, Vue } from 'vue-facing-decorator';
+import type { UserMovie } from '@/types/user-movie';
+import { getUserMoviesByStatus, moveToWatched, removeUserMovie } from '@/services/userMovieStore';
 
 @Component
-class WatchlistPage extends Vue {}
+class WatchlistPage extends Vue {
+  items: UserMovie[] = [];
+
+  async mounted() {
+    await this.reload();
+  }
+
+  async reload() {
+    this.items = await getUserMoviesByStatus('WATCHLIST');
+  }
+
+  async onMoveToWatched(movieId: number) {
+    await moveToWatched(movieId);
+    await this.reload();
+    alert('본 영화로 이동! 🐹');
+  }
+
+  async onRemove(movieId: number) {
+    await removeUserMovie(movieId);
+    await this.reload();
+  }
+
+  posterUrl(path: string | null) {
+    if (!path) return '';
+    return `https://image.tmdb.org/t/p/w342${path}`;
+  }
+
+  yearOf(dateStr: string | null) {
+    if (!dateStr) return '-';
+    return dateStr.slice(0, 4);
+  }
+}
 
 export default toNative(WatchlistPage);
 </script>
