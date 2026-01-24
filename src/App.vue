@@ -1,23 +1,32 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <router-view />
+  <div class="app-shell">
+    <main class="app-main">
+      <RouterView />
+    </main>
+
+    <BottomTabBar />
+  </div>
 </template>
 
+<script lang="ts">
+import { Component, toNative } from 'vue-facing-decorator';
+import BottomTabBar from '@/components/layout/BottomTabBar.vue';
+
+@Component({
+  name: 'App',
+  components: { BottomTabBar },
+})
+class App {}
+
+export default toNative(App);
+</script>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.app-shell{
+  min-height: 100vh;
 }
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+
+.app-main{
+  padding-bottom: 64px; /* 탭바 높이 */
 }
 </style>

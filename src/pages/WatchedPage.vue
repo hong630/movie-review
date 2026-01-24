@@ -1,7 +1,4 @@
 <template>
-  <div class="page-search">
-    본 작품
-  </div>
 </template>
 
 <script lang="ts">
@@ -13,10 +10,3 @@ export default toNative(WatchedPage);
 
 </script>
 
-<style scoped>
-.page-search {
-  padding: 16px;
-  font-size: 20px;
-  font-weight: 600;
-}
-</style>
