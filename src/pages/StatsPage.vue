@@ -5,9 +5,11 @@
 </template>
 
 <script lang="ts">
-import { Vue } from 'vue-facing-decorator';
+import {Component, toNative, Vue} from 'vue-facing-decorator';
 
-export default class StatsPage extends Vue {}
+@Component
+class StatsPage extends Vue {}
+export default toNative(StatsPage);
 </script>
 
 <style scoped>

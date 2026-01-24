@@ -5,9 +5,11 @@
 </template>
 
 <script lang="ts">
-import { Vue } from 'vue-facing-decorator';
+import {Component, toNative, Vue} from 'vue-facing-decorator';
 
-export default class WatchlistPage extends Vue {}
+@Component
+class WatchlistPage extends Vue {}
+export default toNative(WatchlistPage);
 </script>
 
 <style scoped>
