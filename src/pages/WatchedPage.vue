@@ -31,13 +31,13 @@
 </template>
 
 <script lang="ts">
-import {Component, toNative, Vue} from 'vue-facing-decorator';
+import {Component, Vue} from 'vue-facing-decorator';
 import type {UserMovie} from '@/types/user-movie';
 import {getUserMoviesByStatus, removeUserMovie} from '@/services/userMovieStore';
 import {router} from "@/router";
 
 @Component
-export default class WatchedPage extends Vue {
+class WatchedPage extends Vue {
   items: UserMovie[] = [];
 
   async mounted() {
@@ -72,4 +72,5 @@ export default class WatchedPage extends Vue {
     return iso.slice(0, 10);
   }
 }
+export default WatchedPage;
 </script>

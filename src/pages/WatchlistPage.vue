@@ -29,12 +29,12 @@
 </template>
 
 <script lang="ts">
-import { Component, toNative, Vue } from 'vue-facing-decorator';
+import { Component, Vue } from 'vue-facing-decorator';
 import type { UserMovie } from '@/types/user-movie';
 import { getUserMoviesByStatus, moveToWatched, removeUserMovie } from '@/services/userMovieStore';
 
 @Component
-export default class WatchlistPage extends Vue {
+class WatchlistPage extends Vue {
   items: UserMovie[] = [];
 
   async mounted() {
@@ -66,4 +66,5 @@ export default class WatchlistPage extends Vue {
     return dateStr.slice(0, 4);
   }
 }
+export default WatchlistPage;
 </script>

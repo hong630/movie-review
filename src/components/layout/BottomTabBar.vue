@@ -19,12 +19,11 @@
 </template>
 
 <script lang="ts">
-import { Component, toNative } from 'vue-facing-decorator';
+import { Component } from 'vue-facing-decorator';
 
 @Component({ name: 'BottomTabBar' })
 class BottomTabBar {}
-
-export default toNative(BottomTabBar);
+export default BottomTabBar;
 </script>
 
 <style scoped>

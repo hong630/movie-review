@@ -79,12 +79,12 @@
 </template>
 
 <script lang="ts">
-import {Component, toNative, Vue} from 'vue-facing-decorator';
+import {Component, Vue} from 'vue-facing-decorator';
 import {getUserMovie, saveReview} from '@/services/userMovieStore';
 import {useRoute, useRouter} from "vue-router";
 
 @Component
-export default class ReviewEditorPage extends Vue {
+class ReviewEditorPage extends Vue {
   private router = useRouter();
   private route = useRoute();
 
@@ -134,5 +134,5 @@ export default class ReviewEditorPage extends Vue {
     this.router.back();
   }
 }
-
+export default ReviewEditorPage;
 </script>

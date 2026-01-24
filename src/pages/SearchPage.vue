@@ -53,7 +53,7 @@
 </template>
 
 <script lang="ts">
-import {Component, toNative, Vue} from 'vue-facing-decorator';
+import {Component, Vue} from 'vue-facing-decorator';
 import {trendingMovies, searchMovies} from '@/services/tmdb.ts';
 import {addToWatchlist, markWatched} from "@/services/userMovieStore.ts";
 import {router} from "@/router";
@@ -67,7 +67,7 @@ type TmdbMovie = {
   vote_average: number;
 };
 @Component({name: 'SearchPage'})
-export default class SearchPage extends Vue {
+class SearchPage extends Vue {
   query = '';
   movies: TmdbMovie[] = [];
   loading = false;
@@ -158,4 +158,5 @@ export default class SearchPage extends Vue {
     router.push(`/movie/${m.id}/review`);
   }
 }
+export default SearchPage;
 </script>

@@ -9,24 +9,23 @@
 </template>
 
 <script lang="ts">
-import { Component, toNative } from 'vue-facing-decorator';
+import { defineComponent } from 'vue';
 import BottomTabBar from '@/components/layout/BottomTabBar.vue';
 
-@Component({
+export default defineComponent({
   name: 'App',
-  components: { BottomTabBar },
-})
-class App {}
-
-export default toNative(App);
+  components: {
+    BottomTabBar,
+  },
+});
 </script>
 
 <style scoped>
-.app-shell{
+.app-shell {
   min-height: 100vh;
 }
 
-.app-main{
+.app-main {
   padding-bottom: 64px; /* 탭바 높이 */
 }
 </style>
