@@ -2,29 +2,40 @@
   <div class="page-review-editor">
     <!-- 상단 바 -->
     <header class="review-topbar">
-      <button class="icon-btn" type="button" aria-label="뒤로">
+      <button class="icon-btn" type="button" aria-label="뒤로" @click="onBack">
         ←
       </button>
 
-      <h1 class="review-topbar-title">영화 타이틀</h1>
+      <h1 class="review-topbar-title">{{ movie?.title || '리뷰' }}</h1>
 
-      <button class="topbar-save" type="button">저장</button>
+      <button class="topbar-save" type="button" @click="onSave">저장</button>
     </header>
 
     <!-- 영화 정보 -->
     <section class="review-movie">
-      <div class="review-poster" aria-hidden="true"></div>
+      <div class="review-poster" aria-hidden="true">
+        <img
+            v-if="posterUrl(movie?.posterPath)"
+            :src="posterUrl(movie?.posterPath || null)"
+            :alt="movie?.title || ''"
+            class="review-poster-img"
+        />
+      </div>
 
       <div class="review-movie-body">
-        <h2 class="review-movie-title">영화 타이틀</h2>
-        <p class="review-movie-sub">메모...</p>
+        <h2 class="review-movie-title">{{ movie?.title || '-' }}</h2>
+        <p class="review-movie-sub">{{ movie?.releaseDate || '-' }}</p>
 
         <div class="review-stars" aria-label="별점">
-          <button class="star is-on" type="button">★</button>
-          <button class="star is-on" type="button">★</button>
-          <button class="star is-on" type="button">★</button>
-          <button class="star" type="button">★</button>
-          <button class="star" type="button">★</button>
+          <button
+              v-for="n in 5"
+              :key="n"
+              class="star"
+              :class="{ 'is-on': (rating || 0) >= n }"
+              type="button"
+              @click="setRating(n)"
+          >★
+          </button>
         </div>
       </div>
     </section>
@@ -33,7 +44,12 @@
     <section class="review-section">
       <h3 class="review-section-title">별점</h3>
       <div class="review-textbox">
-        <textarea class="review-textarea" placeholder="리뷰를 작성하세요..." rows="5"></textarea>
+        <textarea
+            class="review-textarea"
+            placeholder="리뷰를 작성하세요..."
+            rows="5"
+            v-model="review"
+        ></textarea>
       </div>
     </section>
 
@@ -56,17 +72,67 @@
 
     <!-- 하단 버튼 -->
     <footer class="review-footer">
-      <button class="btn btn-outline footer-btn" type="button">취소</button>
-      <button class="btn btn-solid footer-btn footer-btn--primary" type="button">저장</button>
+      <button class="btn btn-outline footer-btn" type="button" @click="onBack">취소</button>
+      <button class="btn btn-solid footer-btn footer-btn--primary" type="button" @click="onSave">저장</button>
     </footer>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, toNative, Vue } from 'vue-facing-decorator';
+import {Component, toNative, Vue} from 'vue-facing-decorator';
+import {getUserMovie, saveReview} from '@/services/userMovieStore';
+import {useRoute, useRouter} from "vue-router";
 
 @Component
-class ReviewEditorPage extends Vue {}
+export default class ReviewEditorPage extends Vue {
+  private router = useRouter();
+  private route = useRoute();
 
-export default toNative(ReviewEditorPage);
+
+  movieId: number = 0;
+  movie: any = null;
+
+  rating: number | null = null;
+  review: string = '';
+
+  async mounted() {
+    const id = Number((this.route.params as any).movieId);
+    this.movieId = Number.isFinite(id) ? id : 0;
+    await this.load();
+  }
+
+  async load() {
+    if (!this.movieId) return;
+    const m = await getUserMovie(this.movieId);
+    this.movie = m;
+    this.rating = m?.rating ?? null;
+    this.review = m?.review ?? '';
+  }
+
+  setRating(n: number) {
+    this.rating = n;
+  }
+
+  posterUrl(path: string | null) {
+    if (!path) return '';
+    // 저장된 posterPath가 TMDB file path(/xxx.jpg)라면 그대로
+    return `https://image.tmdb.org/t/p/w342${path}`;
+  }
+
+  async onSave() {
+    if (!this.movieId) return;
+    await saveReview({
+      movieId: this.movieId,
+      rating: this.rating,
+      review: this.review,
+    });
+    alert('저장 완료! 🐹');
+    this.router.back();
+  }
+
+  onBack() {
+    this.router.back();
+  }
+}
+
 </script>

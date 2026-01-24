@@ -65,9 +65,8 @@ type TmdbMovie = {
   release_date: string | null;
   vote_average: number;
 };
-
-@Component
-class SearchPage extends Vue {
+@Component({ name: 'SearchPage' })
+export default class SearchPage extends Vue {
   query = '';
   movies: TmdbMovie[] = [];
   loading = false;
@@ -132,7 +131,7 @@ class SearchPage extends Vue {
     return v.toFixed(1);
   }
 
-  async onAddWatchlist(m: any) {
+  async onAddWatchlist(m: TmdbMovie & { genre_ids?: number[] }) {
     await addToWatchlist({
       movieId: m.id,
       title: m.title,
@@ -143,7 +142,7 @@ class SearchPage extends Vue {
     alert('볼 영화에 추가했어! 🐹');
   }
 
-  async onAddWatched(m: any) {
+  async onAddWatched(m: TmdbMovie & { genre_ids?: number[] }) {
     await markWatched({
       movieId: m.id,
       title: m.title,
@@ -154,6 +153,4 @@ class SearchPage extends Vue {
     alert('본 영화에 추가했어! 🐹');
   }
 }
-
-export default toNative(SearchPage);
 </script>

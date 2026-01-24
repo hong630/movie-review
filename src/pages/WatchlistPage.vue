@@ -34,7 +34,7 @@ import type { UserMovie } from '@/types/user-movie';
 import { getUserMoviesByStatus, moveToWatched, removeUserMovie } from '@/services/userMovieStore';
 
 @Component
-class WatchlistPage extends Vue {
+export default class WatchlistPage extends Vue {
   items: UserMovie[] = [];
 
   async mounted() {
@@ -66,6 +66,4 @@ class WatchlistPage extends Vue {
     return dateStr.slice(0, 4);
   }
 }
-
-export default toNative(WatchlistPage);
 </script>

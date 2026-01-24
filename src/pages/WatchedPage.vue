@@ -36,7 +36,7 @@ import type { UserMovie } from '@/types/user-movie';
 import { getUserMoviesByStatus, removeUserMovie } from '@/services/userMovieStore';
 
 @Component
-class WatchedPage extends Vue {
+export default class WatchedPage extends Vue {
   items: UserMovie[] = [];
 
   async mounted() {
@@ -67,6 +67,4 @@ class WatchedPage extends Vue {
     return iso.slice(0, 10);
   }
 }
-
-export default toNative(WatchedPage);
 </script>
