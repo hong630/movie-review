@@ -33,7 +33,7 @@
 
       <article v-for="m in movies" :key="m.id" class="movie-card">
         <div class="movie-thumb" aria-hidden="true">
-          <img v-if="posterUrl(m.poster_path)" class="movie-thumb-img" :src="posterUrl(m.poster_path)" :alt="m.title" />
+          <img v-if="posterUrl(m.poster_path)" class="movie-thumb-img" :src="posterUrl(m.poster_path)" :alt="m.title"/>
         </div>
 
         <div class="movie-body">
@@ -44,7 +44,7 @@
           <div class="movie-actions">
             <button class="btn btn-outline" type="button" @click="onAddWatchlist(m)">+ 볼 영화</button>
             <button class="btn btn-outline" type="button" @click="onAddWatched(m)">+ 본 영화</button>
-            <button class="btn btn-solid" type="button">리뷰</button>
+            <button class="btn btn-solid" type="button" @click="onGoReview(m)">리뷰</button>
           </div>
         </div>
       </article>
@@ -53,9 +53,10 @@
 </template>
 
 <script lang="ts">
-import { Component, toNative, Vue } from 'vue-facing-decorator';
-import { trendingMovies, searchMovies } from '@/services/tmdb.ts';
+import {Component, toNative, Vue} from 'vue-facing-decorator';
+import {trendingMovies, searchMovies} from '@/services/tmdb.ts';
 import {addToWatchlist, markWatched} from "@/services/userMovieStore.ts";
+import {router} from "@/router";
 
 type TmdbMovie = {
   id: number;
@@ -65,7 +66,7 @@ type TmdbMovie = {
   release_date: string | null;
   vote_average: number;
 };
-@Component({ name: 'SearchPage' })
+@Component({name: 'SearchPage'})
 export default class SearchPage extends Vue {
   query = '';
   movies: TmdbMovie[] = [];
@@ -151,6 +152,10 @@ export default class SearchPage extends Vue {
       genres: m.genre_ids || [],
     });
     alert('본 영화에 추가했어! 🐹');
+  }
+
+  onGoReview(m: TmdbMovie) {
+    router.push(`/movie/${m.id}/review`);
   }
 }
 </script>

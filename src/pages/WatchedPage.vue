@@ -9,7 +9,7 @@
 
       <article v-for="x in items" :key="x.movieId" class="watched-card">
         <div class="watched-thumb" aria-hidden="true">
-          <img v-if="posterUrl(x.posterPath)" class="movie-thumb-img" :src="posterUrl(x.posterPath)" :alt="x.title" />
+          <img v-if="posterUrl(x.posterPath)" class="movie-thumb-img" :src="posterUrl(x.posterPath)" :alt="x.title"/>
         </div>
 
         <div class="watched-body">
@@ -21,7 +21,7 @@
           </div>
 
           <div class="watched-actions">
-            <button class="btn btn-solid" type="button">리뷰</button>
+            <button class="btn btn-solid" type="button" @click="onGoReview(x.movieId)">리뷰</button>
             <button class="btn btn-outline" type="button" @click="onRemove(x.movieId)">삭제</button>
           </div>
         </div>
@@ -31,9 +31,10 @@
 </template>
 
 <script lang="ts">
-import { Component, toNative, Vue } from 'vue-facing-decorator';
-import type { UserMovie } from '@/types/user-movie';
-import { getUserMoviesByStatus, removeUserMovie } from '@/services/userMovieStore';
+import {Component, toNative, Vue} from 'vue-facing-decorator';
+import type {UserMovie} from '@/types/user-movie';
+import {getUserMoviesByStatus, removeUserMovie} from '@/services/userMovieStore';
+import {router} from "@/router";
 
 @Component
 export default class WatchedPage extends Vue {
@@ -55,6 +56,10 @@ export default class WatchedPage extends Vue {
   posterUrl(path: string | null) {
     if (!path) return '';
     return `https://image.tmdb.org/t/p/w342${path}`;
+  }
+
+  onGoReview(movieId: number) {
+    router.push(`/movie/${movieId}/review`);
   }
 
   yearOf(dateStr: string | null) {
