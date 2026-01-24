@@ -1,6 +1,5 @@
 <template>
   <div class="page-search">
-    <!-- 상단 타이틀 -->
     <header class="search-header">
       <h1 class="search-title">탐색</h1>
     </header>
@@ -9,62 +8,38 @@
     <section class="search-bar">
       <div class="search-input-wrap">
         <span class="search-icon">🔎</span>
-        <input class="search-input" type="text" placeholder="영화 검색..." />
+        <input
+            class="search-input"
+            type="text"
+            placeholder="영화 검색..."
+            :value="query"
+            @input="onInput"
+        />
       </div>
     </section>
 
-    <!-- 필터 탭 -->
+    <!-- 필터 탭 (일단 UI만) -->
     <section class="search-filter">
       <div class="segmented">
-        <button class="seg-item is-active" type="button">연기</button>
+        <button class="seg-item is-active" type="button">트렌딩</button>
         <button class="seg-item" type="button">장르</button>
       </div>
     </section>
 
-    <!-- 검색 결과 리스트 -->
+    <!-- 결과 -->
     <section class="search-results">
-      <!-- 카드 1 -->
-      <article class="movie-card">
-        <div class="movie-thumb" aria-hidden="true"></div>
+      <p v-if="loading" class="search-loading">불러오는 중...</p>
+      <p v-else-if="!movies.length" class="search-empty">결과가 없어 🥹</p>
 
-        <div class="movie-body">
-          <h2 class="movie-title">영화 제목</h2>
-          <p class="movie-meta">연도 | ★★★★☆</p>
-          <p class="movie-desc">간단한 줄거리...</p>
-
-          <div class="movie-actions">
-            <button class="btn btn-outline" type="button">+ 볼 영화</button>
-            <button class="btn btn-outline" type="button">+ 본 영화</button>
-            <button class="btn btn-solid" type="button">리뷰</button>
-          </div>
+      <article v-for="m in movies" :key="m.id" class="movie-card">
+        <div class="movie-thumb" aria-hidden="true">
+          <img v-if="posterUrl(m.poster_path)" class="movie-thumb-img" :src="posterUrl(m.poster_path)" :alt="m.title" />
         </div>
-      </article>
-
-      <!-- 카드 2 -->
-      <article class="movie-card">
-        <div class="movie-thumb" aria-hidden="true"></div>
 
         <div class="movie-body">
-          <h2 class="movie-title">영화 제목</h2>
-          <p class="movie-meta">연도 | ★★★★☆</p>
-          <p class="movie-desc">간단한 줄거리...</p>
-
-          <div class="movie-actions">
-            <button class="btn btn-outline" type="button">+ 볼 영화</button>
-            <button class="btn btn-outline" type="button">+ 본 영화</button>
-            <button class="btn btn-solid" type="button">리뷰</button>
-          </div>
-        </div>
-      </article>
-
-      <!-- 카드 3 -->
-      <article class="movie-card">
-        <div class="movie-thumb" aria-hidden="true"></div>
-
-        <div class="movie-body">
-          <h2 class="movie-title">영화 제목</h2>
-          <p class="movie-meta">연도 | ★★★★☆</p>
-          <p class="movie-desc">간단한 줄거리...</p>
+          <h2 class="movie-title">{{ m.title }}</h2>
+          <p class="movie-meta">{{ yearOf(m.release_date) }} | ★ {{ formatScore(m.vote_average) }}</p>
+          <p class="movie-desc">{{ m.overview || '줄거리 정보가 없당 🐹' }}</p>
 
           <div class="movie-actions">
             <button class="btn btn-outline" type="button">+ 볼 영화</button>
@@ -79,9 +54,83 @@
 
 <script lang="ts">
 import { Component, toNative, Vue } from 'vue-facing-decorator';
+import { trendingMovies, searchMovies } from '@/services/tmdb.ts';
+
+type TmdbMovie = {
+  id: number;
+  title: string;
+  overview: string;
+  poster_path: string | null;
+  release_date: string | null;
+  vote_average: number;
+};
 
 @Component
-class SearchPage extends Vue {}
+class SearchPage extends Vue {
+  query = '';
+  movies: TmdbMovie[] = [];
+  loading = false;
+
+  private debounceTimer: number | null = null;
+
+  async mounted() {
+    await this.loadTrending();
+  }
+
+  async loadTrending() {
+    this.loading = true;
+    try {
+      const data = await trendingMovies(1);
+      this.movies = (data?.results || []) as TmdbMovie[];
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async loadSearch(q: string) {
+    this.loading = true;
+    try {
+      const data = await searchMovies(q, 1);
+      this.movies = (data?.results || []) as TmdbMovie[];
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  onInput(e: Event) {
+    const v = (e.target as HTMLInputElement).value;
+    this.query = v;
+
+    if (this.debounceTimer) {
+      window.clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
+
+    this.debounceTimer = window.setTimeout(async () => {
+      const q = this.query.trim();
+      if (!q) {
+        await this.loadTrending();
+        return;
+      }
+      await this.loadSearch(q);
+    }, 350);
+  }
+
+  posterUrl(path: string | null) {
+    if (!path) return '';
+    return `https://image.tmdb.org/t/p/w342${path}`;
+  }
+
+  yearOf(dateStr: string | null) {
+    if (!dateStr) return '-';
+    return dateStr.slice(0, 4);
+  }
+
+  formatScore(v: number) {
+    if (typeof v !== 'number') return '-';
+    return v.toFixed(1);
+  }
+}
 
 export default toNative(SearchPage);
 </script>

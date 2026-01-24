@@ -146,6 +146,21 @@ table {
     border: 1px solid #cfcfcf;
     border-radius: 10px;
     background: linear-gradient(135deg, #f4f4f4 0%, #eaeaea 100%);
+    overflow: hidden;
+}
+
+.movie-thumb-img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.search-loading,
+.search-empty{
+    margin: 10px 0 0;
+    font-size: 13px;
+    color: #666;
 }
 
 .movie-body{
