@@ -130,6 +130,7 @@ import {Component, Vue} from 'vue-facing-decorator';
 import {trendingMovies, searchMovies} from '@/services/tmdb.ts';
 import {toggleWatchlist, toggleWatched, getUserMovieIdSets} from "@/services/userMovieStore.ts";
 import {router} from "@/router";
+import type {UserMovieToggleResult} from '@/types/user-movie';
 
 type TmdbMovie = {
   id: number;
@@ -147,6 +148,7 @@ class SearchPage extends Vue {
   loading = false;
   watchlistIdSet = new Set<number>();
   watchedIdSet = new Set<number>();
+  private busy = false;
 
   private debounceTimer: number | null = null;
   private page = 1;
@@ -297,28 +299,63 @@ class SearchPage extends Vue {
     return v.toFixed(1);
   }
 
+  private toastByAction(res: UserMovieToggleResult) {
+    switch (res.action) {
+      case 'ADDED_TO_WATCHLIST':
+        alert('볼 영화에 추가했어요!');
+        return;
+      case 'REMOVED_FROM_WATCHLIST':
+        alert('볼 영화에서 삭제했어요!');
+        return;
+      case 'MOVED_TO_WATCHLIST':
+        alert('본 영화에서 빼고 볼 영화로 옮겼어요!');
+        return;
+      case 'ADDED_TO_WATCHED':
+        alert('본 영화에 추가했어요!');
+        return;
+      case 'REMOVED_FROM_WATCHED':
+        alert('본 영화에서 삭제했어요!');
+        return;
+      case 'MOVED_TO_WATCHED':
+        alert('볼 영화에서 빼고 본 영화로 옮겼어요!');
+        return;
+    }
+  }
+
   async onAddWatchlist(m: TmdbMovie & { genre_ids?: number[] }) {
-    await toggleWatchlist({
-      movieId: m.id,
-      title: m.title,
-      posterPath: m.poster_path || null,
-      releaseDate: m.release_date || null,
-      genres: m.genre_ids || [],
-    });
-    await this.refreshSaved();
-    alert('반영했어요!');
+    if (this.busy) return;
+    this.busy = true;
+    try {
+      const res = await toggleWatchlist({
+        movieId: m.id,
+        title: m.title,
+        posterPath: m.poster_path || null,
+        releaseDate: m.release_date || null,
+        genres: m.genre_ids || [],
+      });
+      await this.refreshSaved();
+      this.toastByAction(res);
+    } finally {
+      this.busy = false;
+    }
   }
 
   async onAddWatched(m: TmdbMovie & { genre_ids?: number[] }) {
-    await toggleWatched({
-      movieId: m.id,
-      title: m.title,
-      posterPath: m.poster_path || null,
-      releaseDate: m.release_date || null,
-      genres: m.genre_ids || [],
-    });
-    await this.refreshSaved();
-    alert('반영했어요!');
+    if (this.busy) return;
+    this.busy = true;
+    try {
+      const res = await toggleWatched({
+        movieId: m.id,
+        title: m.title,
+        posterPath: m.poster_path || null,
+        releaseDate: m.release_date || null,
+        genres: m.genre_ids || [],
+      });
+      await this.refreshSaved();
+      this.toastByAction(res);
+    } finally {
+      this.busy = false;
+    }
   }
 
   onGoReview(m: TmdbMovie) {

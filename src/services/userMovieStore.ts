@@ -1,6 +1,6 @@
 import {toRaw} from 'vue';
 import localforage from 'localforage';
-import type {UserMovie, UserMovieStatus} from '@/types/user-movie';
+import type {UserMovie, UserMovieStatus, UserMovieToggleResult} from '@/types/user-movie';
 
 const STORE_NAME = 'movie_review_app';
 const KEY = 'user_movies_v1';
@@ -8,6 +8,10 @@ const KEY = 'user_movies_v1';
 localforage.config({
     name: STORE_NAME,
 });
+
+function nowIso() {
+    return new Date().toISOString();
+}
 
 function toPlain<T>(value: T): T {
     const raw = toRaw(value as any);
@@ -143,7 +147,7 @@ export async function addToWatchlist(input: {
     releaseDate: string | null;
     genres?: number[];
 }) {
-    const now = new Date().toISOString();
+    const now = nowIso();
 
     const next: UserMovie = {
         movieId: input.movieId,
@@ -172,7 +176,7 @@ export async function markWatched(input: {
     releaseDate: string | null;
     genres?: number[];
 }) {
-    const now = new Date().toISOString();
+    const now = nowIso();
 
     const list = await getAllUserMovies();
     const existing = list.find((x) => x.movieId === input.movieId);
@@ -205,19 +209,18 @@ export async function toggleWatchlist(input: {
     posterPath: string | null;
     releaseDate: string | null;
     genres?: number[];
-}) {
+}): Promise<UserMovieToggleResult> {
     const list = await getAllUserMovies();
     const existing = list.find((x) => x.movieId === input.movieId);
 
     // 이미 볼 영화면 -> 삭제
     if (existing?.status === 'WATCHLIST') {
         await removeUserMovie(input.movieId);
-        return {action: 'removed'} as const;
+        return {action: 'REMOVED_FROM_WATCHLIST', movie: null};
     }
 
-    // 본 영화면 -> 본 영화에서 제거하고 볼 영화로 스왑
-    // (실제로는 같은 레코드 status만 바꾸는 upsert)
-    await addToWatchlist({
+    // 본 영화였든/없었든 -> 볼 영화로 upsert(스왑 포함)
+    const upserted = await addToWatchlist({
         movieId: input.movieId,
         title: input.title,
         posterPath: input.posterPath,
@@ -225,26 +228,30 @@ export async function toggleWatchlist(input: {
         genres: input.genres || [],
     });
 
-    return {action: 'upserted'} as const;
+    if (existing?.status === 'WATCHED') {
+        return {action: 'MOVED_TO_WATCHLIST', movie: upserted};
+    }
+    return {action: 'ADDED_TO_WATCHLIST', movie: upserted};
 }
+
 export async function toggleWatched(input: {
     movieId: number;
     title: string;
     posterPath: string | null;
     releaseDate: string | null;
     genres?: number[];
-}) {
+}): Promise<UserMovieToggleResult> {
     const list = await getAllUserMovies();
     const existing = list.find((x) => x.movieId === input.movieId);
 
     // 이미 본 영화면 -> 삭제
     if (existing?.status === 'WATCHED') {
         await removeUserMovie(input.movieId);
-        return {action: 'removed'} as const;
+        return {action: 'REMOVED_FROM_WATCHED', movie: null};
     }
 
-    // 볼 영화면 -> 볼 영화에서 제거하고 본 영화로 스왑
-    await markWatched({
+    // 볼 영화였든/없었든 -> 본 영화로 upsert(스왑 포함)
+    const upserted = await markWatched({
         movieId: input.movieId,
         title: input.title,
         posterPath: input.posterPath,
@@ -252,7 +259,10 @@ export async function toggleWatched(input: {
         genres: input.genres || [],
     });
 
-    return {action: 'upserted'} as const;
+    if (existing?.status === 'WATCHLIST') {
+        return {action: 'MOVED_TO_WATCHED', movie: upserted};
+    }
+    return {action: 'ADDED_TO_WATCHED', movie: upserted};
 }
 
 export async function updateMemo(movieId: number, review: string): Promise<void> {
@@ -279,7 +289,7 @@ export async function moveToWatched(movieId: number): Promise<void> {
 
     const target = list[idx];
     if (!target) return;
-    const now = new Date().toISOString();
+    const now = nowIso();
 
     list[idx] = {
         ...target,
