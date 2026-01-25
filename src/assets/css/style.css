@@ -61,7 +61,6 @@ table {
 .app-shell{
     width: 100vw;
     height: 100vh;
-    overflow-x: hidden;
 }
 .app-main{
     background-color: #E8E2D8;
@@ -706,6 +705,10 @@ table {
 /* Movie header */
 .page-review-editor{
     position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow-x: hidden;
+    margin-bottom: -64px;
 }
 
 .poster-image{
@@ -779,8 +782,40 @@ table {
 
 /* Stars */
 .review-stars{
-    display: flex;
+    display: inline-flex;
+    direction: rtl;              /* 시각적으로 5→1 */
+    unicode-bidi: bidi-override; /* rtl 별점용 */
     gap: 6px;
+    padding: 2px 12px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.55);
+    border: 1px solid rgba(200,184,174,0.85);
+    box-shadow: 0 6px 16px rgba(90,62,54,0.14);
+}
+
+.star-label{
+    font-size: 26px;
+    line-height: 1;
+    cursor: pointer;
+    color: #CFC2BC; /* off */
+    transition: transform .12s ease, color .12s ease;
+    user-select: none;
+}
+
+.star-label:hover,
+.star-label:hover ~ .star-label{
+    color: #C18A5A; /* hover */
+    transform: translateY(-1px);
+}
+
+.star-input:checked ~ .star-label{
+    color: #C18A5A; /* selected */
+}
+
+.star-input{
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .star{
@@ -805,42 +840,65 @@ table {
     display: flex;
     flex-direction: column;
     gap: 14px;
-    background: rgba(251, 239, 239, 0.72);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.55);
-    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
     border-radius: 8px;
     padding: 12px;
     box-sizing: border-box;
+    background: rgba(243, 236, 232, 0.78); /* #F3ECE8 */
+    border: 1px solid rgba(200, 184, 174, 0.75); /* #C8B8AE */
+    box-shadow: 0 12px 30px rgba(90, 62, 54, 0.18); /* 브라운 그림자 */
 }
 .star-container{
     display: flex;
-    flex-direction: row;
-    gap: 6px;
+    align-items: center;
+    gap: 12px;
 }
 .star-container > * {
     align-self: center;
 }
+
+/* 클릭 시 뿅! */
+.star-input:checked + .star-label{
+    animation: star-pop .28s cubic-bezier(.2,1.4,.4,1);
+}
+
+@keyframes star-pop{
+    0%   { transform: scale(1); }
+    40%  { transform: scale(1.25) rotate(-6deg); }
+    70%  { transform: scale(.95) rotate(2deg); }
+    100% { transform: scale(1); }
+}
+
+/* 누를 때 살짝 눌리는 느낌 */
+.star-label:active{
+    transform: scale(.9);
+}
+
+
 .review-section-title{
-    font-size: 13px;
+    font-size: 14px;
     font-weight: 900;
     color: #222;
+    padding-left: 4px;
 }
 
 /* Textarea */
-.review-textbox{
-    border: 1px solid #452829;
-    background: #fff;
-    padding: 10px;
-}
-
 .review-textarea{
     width: 100%;
-    border: 0;
-    outline: none;
     resize: none;
     font-size: 14px;
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid #C8B8AE;
+    border-radius: 10px;
+    padding: 10px 12px;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.review-textarea:focus{
+    border-color: #C18A5A;
+    box-shadow: 0 0 0 3px rgba(193, 138, 90, 0.22);
 }
 
 /* Tags */
@@ -867,23 +925,28 @@ table {
 .review-footer{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    position: absolute;
-    top: 82vh;
-    left: 50%;
-    transform: translatex(-50%);
     width: 100%;
+    gap: 6px;
 }
 
 .footer-btn{
-    border-top: 2px solid #452829;
-    border-left: 2px solid #452829;
-    border-bottom: 2px solid #452829;
-    border-radius: 0;
-    height: 40px;
+    height: 42px;
     background-color: transparent;
+    border-radius: 10px;
 }
 
-.footer-btn:first-child{
-    border-right: none;
+/* 하단 버튼 */
+.footer-btn--primary{
+    background: #5A3E36; /* 저장 */
+    color: #fff;
+    border: 1px solid #5A3E36;
+}
+.footer-btn--primary:active{
+    transform: translateY(1px);
 }
 
+.btn.btn-outline.footer-btn{
+    background: rgba(255, 255, 255, 0.35); /* 취소 */
+    border: 1px solid #5A3E36;
+    color: #5A3E36;
+}

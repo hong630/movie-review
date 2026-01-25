@@ -3,7 +3,11 @@
     <!-- 상단 바 -->
     <header class="review-topbar">
       <button class="icon-btn" type="button" aria-label="뒤로" @click="onBack">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M201.4 297.4C188.9 309.9 188.9 330.2 201.4 342.7L361.4 502.7C373.9 515.2 394.2 515.2 406.7 502.7C419.2 490.2 419.2 469.9 406.7 457.4L269.3 320L406.6 182.6C419.1 170.1 419.1 149.8 406.6 137.3C394.1 124.8 373.8 124.8 361.3 137.3L201.3 297.3z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+          <!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+          <path
+              d="M201.4 297.4C188.9 309.9 188.9 330.2 201.4 342.7L361.4 502.7C373.9 515.2 394.2 515.2 406.7 502.7C419.2 490.2 419.2 469.9 406.7 457.4L269.3 320L406.6 182.6C419.1 170.1 419.1 149.8 406.6 137.3C394.1 124.8 373.8 124.8 361.3 137.3L201.3 297.3z"/>
+        </svg>
       </button>
       <!--<button class="topbar-save" type="button" @click="onSave">저장</button>-->
     </header>
@@ -38,16 +42,18 @@
       <div class="star-container">
         <h3 class="review-section-title">별점</h3>
         <div class="review-stars" aria-label="별점">
-      </div>
-        <button
-            v-for="n in 5"
-            :key="n"
-            class="star"
-            :class="{ 'is-on': (rating || 0) >= n }"
-            type="button"
-            @click="setRating(n)"
-        >★
-        </button>
+          <template v-for="n in stars" :key="n">
+            <input
+                class="star-input"
+                type="radio"
+                name="rating"
+                :id="`star-${n}`"
+                :value="n"
+                v-model.number="rating"
+            />
+            <label class="star-label" :for="`star-${n}`" aria-label="별점">★</label>
+          </template>
+        </div>
       </div>
       <div class="review-textbox">
         <textarea
@@ -57,24 +63,27 @@
             v-model="review"
         ></textarea>
       </div>
+      <footer class="review-footer">
+        <button class="btn btn-outline footer-btn" type="button" @click="onBack">취소</button>
+        <button class="btn btn-outline footer-btn footer-btn--primary" type="button" @click="onSave">저장</button>
+      </footer>
     </section>
     <!-- 하단 버튼 -->
-    <footer class="review-footer">
-      <button class="btn footer-btn" type="button" @click="onBack">취소</button>
-      <button class="btn footer-btn" type="button" @click="onSave">저장</button>
-    </footer>
+
   </div>
 </template>
 
 <script lang="ts">
 import {Component, Vue} from 'vue-facing-decorator';
-import {getUserMovie, saveReview} from '@/services/userMovieStore';
+import {getUserMovie, saveReview, toggleWatched} from '@/services/userMovieStore';
 import {useRoute, useRouter} from "vue-router";
 
 @Component
 class ReviewEditorPage extends Vue {
   private router = useRouter();
   private route = useRoute();
+
+  stars = [5, 4, 3, 2, 1];
 
 
   movieId: number = 0;
@@ -128,10 +137,6 @@ class ReviewEditorPage extends Vue {
     }
   }
 
-  setRating(n: number) {
-    this.rating = n;
-  }
-
   posterUrl(path: string | null) {
     if (!path) return '';
     // 저장된 posterPath가 TMDB file path(/xxx.jpg)라면 그대로
@@ -144,6 +149,10 @@ class ReviewEditorPage extends Vue {
       movieId: this.movieId,
       rating: this.rating,
       review: this.review,
+      title: this.movie?.title ?? '',
+      posterPath: this.movie?.posterPath ?? null,
+      releaseDate: this.movie?.releaseDate ?? null,
+      genres: Array.isArray(this.movie?.genres) ? this.movie.genres : [],
     });
     alert('저장 완료!');
     this.router.back();

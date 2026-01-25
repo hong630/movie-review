@@ -126,9 +126,50 @@ export async function saveReview(input: {
     rating: number | null;
     review: string;
     tags?: string[];
+    title?: string;
+    posterPath?: string | null;
+    releaseDate?: string | null;
+    genres?: number[];
 }) {
     const existing = await getUserMovie(input.movieId);
-    if (!existing) return null;
+    // 볼 영화면 본 영화로 스왑(삭제+WATCHED 업서트)까지 처리
+    if (existing?.status === 'WATCHLIST') {
+        await removeUserMovie(input.movieId);
+        const swapped = await markWatched({
+            movieId: input.movieId,
+            title: input.title ?? existing.title ?? '',
+            posterPath: input.posterPath ?? existing.posterPath ?? null,
+            releaseDate: input.releaseDate ?? existing.releaseDate ?? null,
+            genres: Array.isArray(input.genres)
+                ? [...input.genres]
+                : (Array.isArray(existing.genres) ? [...existing.genres] : []),
+        });
+        const nextSwapped: UserMovie = {
+            ...(swapped as UserMovie),
+            rating: input.rating,
+            review: input.review,
+            tags: Array.isArray(input.tags) ? [...input.tags] : existing.tags,
+        };
+        return upsertUserMovie(nextSwapped);
+    }
+    if (!existing) {
+        const created = await markWatched({
+            movieId: input.movieId,
+            title: input.title ?? '',
+            posterPath: input.posterPath ?? null,
+            releaseDate: input.releaseDate ?? null,
+            genres: Array.isArray(input.genres) ? [...input.genres] : [],
+        });
+
+        // markWatched가 생성/업서트 해줬으니, 그 위에 리뷰/별점/태그를 한 번 더 업서트
+        const nextCreated: UserMovie = {
+            ...(created as UserMovie),
+            rating: input.rating,
+            review: input.review,
+            tags: Array.isArray(input.tags) ? [...input.tags] : [],
+        };
+        return upsertUserMovie(nextCreated);
+    }
 
     const next: UserMovie = {
         ...existing,
