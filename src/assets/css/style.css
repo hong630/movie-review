@@ -328,18 +328,40 @@ table {
 
 /* Watched Page */
 .page-watched{
+    padding-bottom: 40px;
 }
 
 .watched-header{
     display: flex;
     justify-content: center;
     padding: 8px 0 10px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    z-index: 1;
+    background-color: #E8E2D8;
+    box-sizing: border-box;
+}
+.watched-title svg{
+    width: 22px;
+    height: 22px;
+    align-self: center;
+}
+
+.watched-title span{
+    align-self: center;
 }
 
 .watched-title{
     font-size: 18px;
     font-weight: 800;
     margin: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
 }
 
 .watched-top{
@@ -430,13 +452,16 @@ table {
 .watched-list{
     display: flex;
     flex-direction: row;
-    gap: 4px;
+    gap: 8px 4px;
     width: 100%;
     flex-wrap: wrap;
     padding: 0 12px;
     box-sizing: border-box;
+    margin-top: 40px;
 }
-
+.watched-text{
+    width: 100%;
+}
 .watched-card{
     background: #fff;
     display: flex;
@@ -516,12 +541,31 @@ table {
     margin: 4px 0 0;
     font-size: 12px;
     opacity: 0.75;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
 .watched-actions{
     display: flex;
     flex-direction: row;
     gap: 8px;
+}
+
+.watched-actions .btn{
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+}
+.watched-actions .btn > *{
+    align-self: center;
+}
+.watched-actions .btn svg{
+    width: 16px;
+    height: 16px;
+}
+.watched-actions .btn span{
+    white-space: nowrap;
 }
 /* Watchlist Page */
 .page-watchlist{
