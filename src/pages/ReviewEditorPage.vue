@@ -75,7 +75,7 @@
 
 <script lang="ts">
 import {Component, Vue} from 'vue-facing-decorator';
-import {getUserMovie, saveReview, toggleWatched} from '@/services/userMovieStore';
+import {getUserMovie, saveReview} from '@/services/userMovieStore';
 import {useRoute, useRouter} from "vue-router";
 
 @Component
