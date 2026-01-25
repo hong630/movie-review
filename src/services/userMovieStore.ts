@@ -44,6 +44,40 @@ export async function getAllUserMovies(): Promise<UserMovie[]> {
     return Array.isArray(list) ? list.map(sanitizeUserMovie) : [];
 }
 
+export async function hasUserMovie(movieId: number): Promise<boolean> {
+    const list = await getAllUserMovies();
+    return list.some((x) => x.movieId === movieId);
+}
+
+export async function getUserMovieIdSet(): Promise<Set<number>> {
+    const list = await getAllUserMovies();
+    return new Set(list.map((x) => x.movieId));
+}
+
+export async function getUserMovieIdSetByStatus(status: UserMovieStatus): Promise<Set<number>> {
+    const list = await getAllUserMovies();
+    return new Set(
+        list
+            .filter((x) => x.status === status)
+            .map((x) => x.movieId)
+    );
+}
+
+export async function getUserMovieIdSets(): Promise<{
+    watchlist: Set<number>;
+    watched: Set<number>;
+}> {
+    const list = await getAllUserMovies();
+    const watchlist = new Set<number>();
+    const watched = new Set<number>();
+
+    for (const m of list) {
+        if (m.status === 'WATCHLIST') watchlist.add(m.movieId);
+        if (m.status === 'WATCHED') watched.add(m.movieId);
+    }
+
+    return {watchlist, watched};
+}
 
 export async function setAllUserMovies(list: UserMovie[]): Promise<void> {
     const safe = Array.isArray(list) ? list.map(sanitizeUserMovie) : [];
@@ -100,6 +134,7 @@ export async function saveReview(input: {
     };
     return upsertUserMovie(next);
 }
+
 
 export async function addToWatchlist(input: {
     movieId: number;
@@ -162,6 +197,62 @@ export async function markWatched(input: {
     };
 
     return upsertUserMovie(next);
+}
+
+export async function toggleWatchlist(input: {
+    movieId: number;
+    title: string;
+    posterPath: string | null;
+    releaseDate: string | null;
+    genres?: number[];
+}) {
+    const list = await getAllUserMovies();
+    const existing = list.find((x) => x.movieId === input.movieId);
+
+    // 이미 볼 영화면 -> 삭제
+    if (existing?.status === 'WATCHLIST') {
+        await removeUserMovie(input.movieId);
+        return {action: 'removed'} as const;
+    }
+
+    // 본 영화면 -> 본 영화에서 제거하고 볼 영화로 스왑
+    // (실제로는 같은 레코드 status만 바꾸는 upsert)
+    await addToWatchlist({
+        movieId: input.movieId,
+        title: input.title,
+        posterPath: input.posterPath,
+        releaseDate: input.releaseDate,
+        genres: input.genres || [],
+    });
+
+    return {action: 'upserted'} as const;
+}
+export async function toggleWatched(input: {
+    movieId: number;
+    title: string;
+    posterPath: string | null;
+    releaseDate: string | null;
+    genres?: number[];
+}) {
+    const list = await getAllUserMovies();
+    const existing = list.find((x) => x.movieId === input.movieId);
+
+    // 이미 본 영화면 -> 삭제
+    if (existing?.status === 'WATCHED') {
+        await removeUserMovie(input.movieId);
+        return {action: 'removed'} as const;
+    }
+
+    // 볼 영화면 -> 볼 영화에서 제거하고 본 영화로 스왑
+    await markWatched({
+        movieId: input.movieId,
+        title: input.title,
+        posterPath: input.posterPath,
+        releaseDate: input.releaseDate,
+        genres: input.genres || [],
+    });
+
+    return {action: 'upserted'} as const;
 }
 
 export async function updateMemo(movieId: number, review: string): Promise<void> {
