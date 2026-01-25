@@ -74,6 +74,15 @@ table {
     display: flex;
     justify-content: center;
     padding: 8px 0 10px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: 100vw;
+    height: 40px;
+    line-height: 40px;
+    background-color: #E8E2D8;
+    box-sizing: border-box;
 }
 
 .search-title{
@@ -215,7 +224,7 @@ table {
 .search-empty{
     display: flex;
     flex-direction: row;
-    height: 260npm px;
+    height: 260px;
     justify-content: center;
     margin: 0;
 }

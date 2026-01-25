@@ -370,6 +370,7 @@ export default SearchPage;
   position: relative;
   width: 100%;
   height: 280px;
+  margin-top: 40px;
 }
 
 .search-image {
