@@ -328,7 +328,6 @@ table {
 
 /* Watched Page */
 .page-watched{
-    padding: 12px 12px 0;
 }
 
 .watched-header{
@@ -353,6 +352,42 @@ table {
     margin: 0 0 10px;
     font-size: 18px;
     font-weight: 900;
+}
+
+.watched-sub{
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.watched-rating{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+}
+
+.rating-stars{
+    color: #C18A5A; /* 브론즈 */
+    letter-spacing: 1px;
+}
+
+.rating-num{
+    opacity: .75;
+}
+
+.watched-review{
+    margin: 0;
+    font-size: 12px;
+    opacity: .82;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.watched-review--empty{
+    opacity: .5;
 }
 
 .watched-filter{
@@ -394,58 +429,99 @@ table {
 /* List */
 .watched-list{
     display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 12px 0 12px;
+    flex-direction: row;
+    gap: 4px;
+    width: 100%;
+    flex-wrap: wrap;
+    padding: 0 12px;
+    box-sizing: border-box;
 }
 
 .watched-card{
-    display: grid;
-    grid-template-columns: 90px 1fr;
-    gap: 12px;
-    padding: 12px;
-    border: 1px solid #e5e5e5;
-    border-radius: 12px;
     background: #fff;
-}
-
-.watched-thumb{
-    width: 90px;
-    height: 104px;
-    border: 1px solid #cfcfcf;
+    display: flex;
+    flex-direction: column;
+    width: calc(50% - 2px);
+    box-sizing: border-box;
+    background: rgba(255,255,255,0.82);
+    border: 1px solid rgba(200,184,174,0.7);
     border-radius: 10px;
-    background: linear-gradient(135deg, #f4f4f4 0%, #eaeaea 100%);
+    box-shadow: 0 14px 30px rgba(0,0,0,0.12);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    overflow: hidden;
+    padding-top: 10px;
 }
 
+/* 포스터 프레임 영역 */
+.watched-frame{
+    position: relative;
+    background: #fff;
+    border-radius: 8px;
+    padding: 8px 8px 14px; /* 아래 여백 = 폴라로이드 감성 */
+    box-shadow: inset 0 0 0 1px rgba(90,62,54,0.12);
+    margin-bottom: 10px;
+}
+
+/* 테이프(상단 중앙) */
+.watched-tape{
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%) rotate(-3deg);
+    width: 64px;
+    height: 22px;
+
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+
+    pointer-events: none;
+    filter: drop-shadow(0 6px 10px rgba(0,0,0,0.18));
+}
+
+/* 포스터 이미지 */
+.watched-thumb{
+    overflow: hidden;
+    border-radius: 6px;
+    background: rgba(0,0,0,0.04);
+    aspect-ratio: 2 / 3;
+}
 .watched-body{
     display: flex;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
     justify-content: space-between;
     gap: 10px;
     min-width: 0;
+    border-top: 1px solid #452829;
+    background-image: url('@/assets/images/grid.png');
+    background-repeat: repeat;
+    background-size: 160px 160px; /* 타일 크기 조절 */
+    padding: 10px;
+    height: 100%;
 }
 
 .watched-movie-title{
-    margin: 0 0 6px;
-    font-size: 15px;
+    margin: 0;
+    font-size: 14px;
     font-weight: 900;
-    white-space: nowrap;
+    line-height: 1.25;
     overflow: hidden;
     text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .watched-movie-meta{
-    margin: 0;
+    margin: 4px 0 0;
     font-size: 12px;
-    color: #777;
+    opacity: 0.75;
 }
 
 .watched-actions{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 8px;
-    align-items: flex-end;
-    flex: 0 0 auto;
 }
 /* Watchlist Page */
 .page-watchlist{
