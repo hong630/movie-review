@@ -139,6 +139,7 @@ type TmdbMovie = {
   poster_path: string | null;
   release_date: string | null;
   vote_average: number;
+  genre_ids?: number[];
 };
 
 @Component({name: 'SearchPage'})
@@ -322,7 +323,7 @@ class SearchPage extends Vue {
     }
   }
 
-  async onAddWatchlist(m: TmdbMovie & { genre_ids?: number[] }) {
+  async onAddWatchlist(m: TmdbMovie) {
     if (this.busy) return;
     this.busy = true;
     try {
@@ -340,7 +341,7 @@ class SearchPage extends Vue {
     }
   }
 
-  async onAddWatched(m: TmdbMovie & { genre_ids?: number[] }) {
+  async onAddWatched(m: TmdbMovie) {
     if (this.busy) return;
     this.busy = true;
     try {

@@ -107,6 +107,10 @@ class ReviewEditorPage extends Vue {
 
     // 2) TMDB에서 영화 상세 불러와서 화면용 movie 구성
     const detail = await this.fetchMovieDetailFromTmdb(this.movieId);
+    const genreIds =
+        Array.isArray(detail?.genres)
+            ? detail.genres.map((g: any) => Number(g?.id)).filter((x: any) => Number.isFinite(x))
+            : (Array.isArray(saved?.genres) ? saved!.genres : []);
     this.movie = {
       movieId: this.movieId,
       // 화면에서 쓰는 키로 매핑
@@ -115,6 +119,7 @@ class ReviewEditorPage extends Vue {
       posterPath: detail?.poster_path ?? saved?.posterPath ?? null,
       // 필요하면 더 얹어도 됨
       overview: detail?.overview ?? '',
+      genres: genreIds,
     };
   }
 

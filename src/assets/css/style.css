@@ -65,6 +65,21 @@ table {
 .app-main{
     background-color: #E8E2D8;
 }
+/* Chrome, Safari */
+::-webkit-scrollbar{
+    display: none;
+}
+
+/* Firefox */
+*{
+    scrollbar-width: none;
+}
+
+/* IE, Edge(구형) */
+*{
+    -ms-overflow-style: none;
+}
+
 /* Search Page */
   .page-search{
       padding: 0;
@@ -575,7 +590,6 @@ table {
 .watchlist-header{
     display: flex;
     justify-content: center;
-    padding: 8px 0 10px;
 }
 
 .watchlist-title{
