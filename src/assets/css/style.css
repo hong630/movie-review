@@ -61,6 +61,7 @@ table {
 .app-shell{
     width: 100vw;
     height: 100vh;
+    overflow-x: hidden;
 }
 .app-main{
     background-color: #E8E2D8;
@@ -670,28 +671,18 @@ table {
     margin: 0 4px;
 }
 /* Review Editor Page */
-.page-review-editor{
-    padding: 0 12px 12px;
-}
-
 /* Topbar */
 .review-topbar{
-    position: sticky;
+    position: fixed;
     top: 0;
-    z-index: 5;
-    height: 48px;
-    display: grid;
-    grid-template-columns: 44px 1fr 64px;
-    align-items: center;
-    background: #fff;
-    border-bottom: 1px solid #e9e9e9;
+    left: 0;
+    right: 0;     /* 또는 width: 100% */
+    z-index: 999;
 }
 
-.review-topbar-title{
-    margin: 0;
-    text-align: center;
-    font-size: 15px;
-    font-weight: 900;
+.review-topbar .icon-btn{
+    width: 40px;
+    height: 40px;
 }
 
 .icon-btn{
@@ -713,36 +704,77 @@ table {
 }
 
 /* Movie header */
+.page-review-editor{
+    position: relative;
+}
+
+.poster-image{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 64vh;
+}
+.review-poster-background{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(10px);
+    transform: scale(1.05);
+    opacity: 0.8;
+}
 .review-movie{
-    display: grid;
-    grid-template-columns: 90px 1fr;
+    position: absolute;
+    top: 48vh;
+    left: 50%;
+    transform: translatex(-50%);
+    width: calc(100% - 24px);
+    height: auto;
+    display: flex;
+    flex-direction: column;
     gap: 12px;
-    padding: 12px 0;
-    border-bottom: 1px solid #efefef;
 }
 
 .review-poster{
-    width: 90px;
-    height: 104px;
-    border: 1px solid #cfcfcf;
-    border-radius: 10px;
-    background: linear-gradient(135deg, #f4f4f4 0%, #eaeaea 100%);
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translatex(-50%);
+    width: 60%;
+    height: 66%;
+}
+
+.review-poster img{
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .review-movie-body{
-    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 8px;
+}
+.review-movie-body > *{
+    align-self: center;
 }
 
 .review-movie-title{
-    margin: 0 0 6px;
-    font-size: 16px;
+    margin: 0;
+    text-align: center;
+    font-size: 24px;
     font-weight: 900;
+    font-style: italic;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 100%;
 }
 
 .review-movie-sub{
     margin: 0 0 10px;
     font-size: 13px;
-    color: #666;
 }
 
 /* Stars */
@@ -765,12 +797,32 @@ table {
 
 /* Sections */
 .review-section{
-    padding: 12px 0;
-    border-bottom: 1px solid #efefef;
+    position: absolute;
+    left: 50%;
+    transform: translatex(-50%);
+    top: 56vh;
+    width: calc(100% - 24px);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    background: rgba(251, 239, 239, 0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    padding: 12px;
+    box-sizing: border-box;
 }
-
+.star-container{
+    display: flex;
+    flex-direction: row;
+    gap: 6px;
+}
+.star-container > * {
+    align-self: center;
+}
 .review-section-title{
-    margin: 0 0 10px;
     font-size: 13px;
     font-weight: 900;
     color: #222;
@@ -778,8 +830,7 @@ table {
 
 /* Textarea */
 .review-textbox{
-    border: 1px solid #cfcfcf;
-    border-radius: 10px;
+    border: 1px solid #452829;
     background: #fff;
     padding: 10px;
 }
@@ -816,14 +867,23 @@ table {
 .review-footer{
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    padding-top: 12px;
+    position: absolute;
+    top: 82vh;
+    left: 50%;
+    transform: translatex(-50%);
+    width: 100%;
 }
 
 .footer-btn{
+    border-top: 2px solid #452829;
+    border-left: 2px solid #452829;
+    border-bottom: 2px solid #452829;
+    border-radius: 0;
     height: 40px;
+    background-color: transparent;
 }
 
-.footer-btn--primary{
-    background: #bdbdbd;
+.footer-btn:first-child{
+    border-right: none;
 }
+

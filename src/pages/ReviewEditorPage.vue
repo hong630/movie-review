@@ -3,16 +3,18 @@
     <!-- 상단 바 -->
     <header class="review-topbar">
       <button class="icon-btn" type="button" aria-label="뒤로" @click="onBack">
-        ←
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M201.4 297.4C188.9 309.9 188.9 330.2 201.4 342.7L361.4 502.7C373.9 515.2 394.2 515.2 406.7 502.7C419.2 490.2 419.2 469.9 406.7 457.4L269.3 320L406.6 182.6C419.1 170.1 419.1 149.8 406.6 137.3C394.1 124.8 373.8 124.8 361.3 137.3L201.3 297.3z"/></svg>
       </button>
-
-      <h1 class="review-topbar-title">{{ movie?.title || '리뷰' }}</h1>
-
-      <button class="topbar-save" type="button" @click="onSave">저장</button>
+      <!--<button class="topbar-save" type="button" @click="onSave">저장</button>-->
     </header>
 
-    <!-- 영화 정보 -->
-    <section class="review-movie">
+    <section class="poster-image">
+      <img
+          v-if="posterUrl(movie?.posterPath)"
+          :src="posterUrl(movie?.posterPath || null)"
+          :alt="movie?.title || ''"
+          class="review-poster-background"
+      />
       <div class="review-poster" aria-hidden="true">
         <img
             v-if="posterUrl(movie?.posterPath)"
@@ -21,28 +23,32 @@
             class="review-poster-img"
         />
       </div>
+    </section>
 
+    <!-- 영화 정보 -->
+    <section class="review-movie">
       <div class="review-movie-body">
-        <h2 class="review-movie-title">{{ movie?.title || '-' }}</h2>
+        <h1 class="review-movie-title">{{ movie?.title || '-' }}</h1>
         <p class="review-movie-sub">{{ movie?.releaseDate || '-' }}</p>
-
-        <div class="review-stars" aria-label="별점">
-          <button
-              v-for="n in 5"
-              :key="n"
-              class="star"
-              :class="{ 'is-on': (rating || 0) >= n }"
-              type="button"
-              @click="setRating(n)"
-          >★
-          </button>
-        </div>
       </div>
     </section>
 
     <!-- 리뷰 입력 -->
     <section class="review-section">
-      <h3 class="review-section-title">별점</h3>
+      <div class="star-container">
+        <h3 class="review-section-title">별점</h3>
+        <div class="review-stars" aria-label="별점">
+      </div>
+        <button
+            v-for="n in 5"
+            :key="n"
+            class="star"
+            :class="{ 'is-on': (rating || 0) >= n }"
+            type="button"
+            @click="setRating(n)"
+        >★
+        </button>
+      </div>
       <div class="review-textbox">
         <textarea
             class="review-textarea"
@@ -52,28 +58,10 @@
         ></textarea>
       </div>
     </section>
-
-    <!-- 태그 추가 -->
-    <section class="review-section">
-      <h3 class="review-section-title">태그 추가</h3>
-
-      <div class="tag-add-row">
-        <button class="btn btn-outline" type="button">+ 태그 추가</button>
-        <button class="btn btn-outline" type="button">+ 태그 추가</button>
-        <button class="btn btn-outline" type="button">+ 태그 추가</button>
-      </div>
-
-      <div class="tag-chips">
-        <span class="chip">장르</span>
-        <span class="chip">재관람</span>
-        <span class="chip">상영일 <span class="chip-sub">📅 2024-04-24</span></span>
-      </div>
-    </section>
-
     <!-- 하단 버튼 -->
     <footer class="review-footer">
-      <button class="btn btn-outline footer-btn" type="button" @click="onBack">취소</button>
-      <button class="btn btn-solid footer-btn footer-btn--primary" type="button" @click="onSave">저장</button>
+      <button class="btn footer-btn" type="button" @click="onBack">취소</button>
+      <button class="btn footer-btn" type="button" @click="onSave">저장</button>
     </footer>
   </div>
 </template>
@@ -103,10 +91,41 @@ class ReviewEditorPage extends Vue {
 
   async load() {
     if (!this.movieId) return;
-    const m = await getUserMovie(this.movieId);
-    this.movie = m;
-    this.rating = m?.rating ?? null;
-    this.review = m?.review ?? '';
+    // 1) 로컬 저장(별점/리뷰 등) 먼저
+    const saved = await getUserMovie(this.movieId);
+    this.rating = saved?.rating ?? null;
+    this.review = saved?.review ?? '';
+
+    // 2) TMDB에서 영화 상세 불러와서 화면용 movie 구성
+    const detail = await this.fetchMovieDetailFromTmdb(this.movieId);
+    this.movie = {
+      movieId: this.movieId,
+      // 화면에서 쓰는 키로 매핑
+      title: detail?.title ?? saved?.title ?? '-',
+      releaseDate: detail?.release_date ?? saved?.releaseDate ?? '-',
+      posterPath: detail?.poster_path ?? saved?.posterPath ?? null,
+      // 필요하면 더 얹어도 됨
+      overview: detail?.overview ?? '',
+    };
+  }
+
+  async fetchMovieDetailFromTmdb(movieId: number) {
+    const token = import.meta.env.VITE_TMDB_TOKEN;
+    if (!token) return null;
+
+    const url = `https://api.themoviedb.org/3/movie/${movieId}?language=ko-KR`;
+    try {
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json;charset=utf-8',
+        },
+      });
+      if (!res.ok) return null;
+      return await res.json();
+    } catch (e) {
+      return null;
+    }
   }
 
   setRating(n: number) {
@@ -134,5 +153,6 @@ class ReviewEditorPage extends Vue {
     this.router.back();
   }
 }
+
 export default ReviewEditorPage;
 </script>
