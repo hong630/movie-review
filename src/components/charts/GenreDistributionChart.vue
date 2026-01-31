@@ -166,7 +166,7 @@ export default class GenreDistributionChart extends Vue {
   content: '';
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.3);
+  background: rgba(0, 0, 0, 0.6);
   pointer-events: none;
   z-index: 1;
 }

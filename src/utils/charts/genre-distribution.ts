@@ -7,13 +7,10 @@ export function buildGenreDistribution(userMovies: any[], resolveGenreName: (id:
 
     for (const m of watched) {
         const ids = Array.isArray(m?.genres) ? m.genres : [];
-        if (ids.length === 0) {
-            counter.set('기타', (counter.get('기타') || 0) + 1);
-            continue;
-        }
+        if (ids.length === 0) continue;
 
         for (const id of ids) {
-            const name = resolveGenreName(Number(id)) || '기타';
+            const name = resolveGenreName(Number(id));
             counter.set(name, (counter.get(name) || 0) + 1);
         }
     }
@@ -34,7 +31,7 @@ export function buildGenreDistribution(userMovies: any[], resolveGenreName: (id:
     const etcSum = existingEtc + restSum;
     if (etcSum > 0) top.push({name: '기타', value: etcSum});
 
-    const total = rowsAll.reduce((acc, x) => acc + x.value, 0);
+    const total = watched.length;
     return {data: top, total};
 }
 

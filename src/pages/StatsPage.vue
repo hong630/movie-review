@@ -54,34 +54,9 @@
             :resolveGenreName="genreNameById"
             :topN="6"
             :height="0"
-            :renderSig="renderSig"
+            :renderSig="genreRenderSig"
         />
       </div>
-    </section>
-
-    <!-- 평점 분포 -->
-    <section class="stats-section">
-      <h3 class="stats-section-title">평점 분포</h3>
-      <ul class="rating-dist">
-        <li v-for="row in ratingDist" :key="row.star" class="rating-row">
-          <span class="rating-star">★ {{ row.star }}</span>
-          <span class="rating-bar">
-            <span class="rating-bar-fill" :style="{ width: row.percent + '%' }"></span>
-          </span>
-          <span class="rating-count">{{ row.count }}</span>
-        </li>
-      </ul>
-    </section>
-
-    <!-- 최다 관람 장르 TOP3 -->
-    <section class="stats-section">
-      <h3 class="stats-section-title">최다 관람 장르 TOP3</h3>
-      <ol class="top3">
-        <li v-for="g in topGenres" :key="g.name" class="top3-item">
-          <span class="top3-name">{{ g.name }}</span>
-          <span class="top3-count">{{ g.count }}편</span>
-        </li>
-      </ol>
     </section>
 
     <!-- 최고/최저 평점 영화 -->
@@ -133,9 +108,6 @@ type StatsMovie = UserMovie & {
   genres?: number[];
 };
 
-type RatingRow = { star: number; count: number; percent: number };
-type GenreRow = { name: string; count: number };
-
 @Component(
     {
       name: 'StatsPage',
@@ -149,17 +121,19 @@ class StatsPage extends Vue {
   private watchedMoviesCache: StatsMovie[] = [];
   private genreMap: Record<number, string> = {};
   renderSig = '';
+  genreRenderSig = '';
 
   async mounted() {
     await this.loadGenreMap();
     await this.loadWatchedMovies();
     this.renderSig = `${Date.now()}`;
+    this.genreRenderSig = `${Date.now()}`;
   }
 
   setMonthMode(mode: MonthMode) {
     if (this.monthMode === mode) return;
     this.monthMode = mode;
-    this.renderSig = `${Date.now()}`; // ✅ 토글 바뀌면 애니메이션 재생
+    this.renderSig = `${Date.now()}`; // 토글 바뀌면 애니메이션 재생
   }
 
   @Watch('period')
@@ -207,41 +181,6 @@ class StatsPage extends Vue {
     return avg.toFixed(1);
   }
 
-  get ratingDist(): RatingRow[] {
-    const list = this.filteredWatchedMovies.filter(m => typeof m.rating === 'number');
-    const total = list.length;
-    const counts = new Map<number, number>();
-    for (let s = 1; s <= 5; s++) counts.set(s, 0);
-    list.forEach(m => {
-      const r = Math.round(Number(m.rating));
-      const star = Math.min(5, Math.max(1, r));
-      counts.set(star, (counts.get(star) || 0) + 1);
-    });
-    // 5점부터 보여주면 예쁨
-    const rows: RatingRow[] = [];
-    for (let s = 5; s >= 1; s--) {
-      const c = counts.get(s) || 0;
-      const p = total === 0 ? 0 : Math.round((c / total) * 100);
-      rows.push({star: s, count: c, percent: p});
-    }
-    return rows;
-  }
-
-  get topGenres(): GenreRow[] {
-    const list = this.filteredWatchedMovies;
-    const counter = new Map<string, number>();
-    list.forEach(m => {
-      const names = this.getGenreNames(m);
-      names.forEach(name => {
-        counter.set(name, (counter.get(name) || 0) + 1);
-      });
-    });
-    return Array.from(counter.entries())
-        .map(([name, count]) => ({name, count}))
-        .sort((a, b) => b.count - a.count)
-        .slice(0, 3);
-  }
-
   get topRatedMovies(): StatsMovie[] {
     return this.filteredWatchedMovies
         .filter(m => typeof m.rating === 'number')
@@ -256,13 +195,6 @@ class StatsPage extends Vue {
         .slice()
         .sort((a, b) => (a.rating || 0) - (b.rating || 0))
         .slice(0, 5);
-  }
-
-  // 숫자 장르ID -> 이름 매핑 (TMDB 장르 테이블로 바꿔치기 가능)
-  getGenreNames(m: StatsMovie): string[] {
-    const ids = Array.isArray(m.genres) ? m.genres : [];
-    if (ids.length === 0) return ['기타'];
-    return ids.map(id => this.genreNameById(id));
   }
 
   genreNameById(id: number): string {
