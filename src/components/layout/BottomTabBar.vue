@@ -38,6 +38,7 @@ export default BottomTabBar;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   background-color: #452829;
+  z-index: 9999;
 }
 
 .tabbar svg{

@@ -695,6 +695,7 @@ table {
 /* Stats Page */
 .page-stats{
     padding: 12px 12px 0;
+    padding-bottom: 40px;
 }
 
 .stats-header{
@@ -716,7 +717,6 @@ table {
 }
 
 .stats-subtitle{
-    margin: 0 0 10px;
     font-size: 18px;
     font-weight: 900;
 }
@@ -753,7 +753,7 @@ table {
 }
 
 .stats-section-title{
-    margin: 0 0 4px;
+    margin: 0 0 10px;
     font-size: 15px;
     font-weight: 900;
     color: #222;
