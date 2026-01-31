@@ -770,7 +770,7 @@ table {
 }
 
 .chart-box--pie{
-    height: 220px;   /* 파이차트용 */
+    height: 300px;   /* 파이차트용 */
 }
 
 /* Legend */

@@ -47,15 +47,16 @@
 
     <!-- 장르 분포 -->
     <section class="stats-section">
-      <h3 class="stats-section-title">장르 분포</h3>
-      <div class="chart-box chart-box--pie" id="genreChart" ref="genreChart"></div>
-
-      <ul class="genre-legend">
-        <li class="genre-item"><span class="dot"></span> 액션</li>
-        <li class="genre-item"><span class="dot"></span> 드라마</li>
-        <li class="genre-item"><span class="dot"></span> 코미디</li>
-        <li class="genre-item"><span class="dot"></span> 기타</li>
-      </ul>
+      <h3 class="stats-section-title genre-percent">장르 분포</h3>
+      <div class="chart-box chart-box--pie">
+        <GenreDistributionChart
+            :userMovies="watchedMovies"
+            :resolveGenreName="genreNameById"
+            :topN="6"
+            :height="0"
+            :renderSig="renderSig"
+        />
+      </div>
     </section>
 
     <!-- 평점 분포 -->
@@ -121,6 +122,7 @@ import type {UserMovie} from "@/types/user-movie.ts";
 import {getUserMoviesByStatus} from "@/services/userMovieStore.ts";
 import {getGenreMap, genreNameById} from '@/stores/genre-cache';
 import MonthlyWatchedChart from "@/components/charts/MonthlyWatchedChart.vue";
+import GenreDistributionChart from "@/components/charts/GenreDistributionChart.vue";
 
 type PeriodKey = '30d' | '3m' | '6m' | 'all';
 type MonthMode = 'year' | 'last12';
@@ -137,7 +139,7 @@ type GenreRow = { name: string; count: number };
 @Component(
     {
       name: 'StatsPage',
-      components: {MonthlyWatchedChart},
+      components: {MonthlyWatchedChart, GenreDistributionChart},
     }
 )
 class StatsPage extends Vue {
@@ -310,5 +312,8 @@ export default StatsPage;
 
 .pill-btn:active {
   transform: scale(0.98);
+}
+.genre-percent{
+  margin-bottom: 12px;
 }
 </style>

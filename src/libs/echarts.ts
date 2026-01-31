@@ -1,9 +1,11 @@
 // src/libs/echarts.ts
 import * as echarts from 'echarts/core';
-import {BarChart} from 'echarts/charts';
+import {BarChart, PieChart} from 'echarts/charts';
 import {
     GridComponent,
     TooltipComponent,
+    LegendComponent,
+    GraphicComponent,
     DatasetComponent,
     TransformComponent,
 } from 'echarts/components';
@@ -12,8 +14,11 @@ import {CanvasRenderer} from 'echarts/renderers';
 
 echarts.use([
     BarChart,
+    PieChart,
     GridComponent,
     TooltipComponent,
+    LegendComponent,
+    GraphicComponent,
     DatasetComponent,
     TransformComponent,
     LabelLayout,
