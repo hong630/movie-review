@@ -7,24 +7,42 @@
 
     <section class="stats-top">
       <h2 class="stats-subtitle">나의 관람 통계</h2>
-
-      <div class="stats-row">
-        <span class="stats-label">기간:</span>
-        <select class="stats-select"
-                v-model="period"
-        >
-          <option value="30d">최근 30일</option>
-          <option value="3m">최근 3개월</option>
-          <option value="6m">최근 6개월</option>
-          <option value="all">전체</option>
-        </select>
-      </div>
     </section>
 
     <!-- 월별 관람 수 -->
     <section class="stats-section">
-      <h3 class="stats-section-title">월별 관람 수</h3>
-      <div class="chart-box" id="monthlyChart" ref="monthlyChart"></div>
+      <div class="stats-row">
+        <h3 class="stats-section-title">월별 관람 수</h3>
+        <!-- 월별 관람 수 기준 토글 -->
+        <div class="stats-row">
+          <div class="pill-toggle" role="tablist" aria-label="월별 관람 기준">
+            <button
+                type="button"
+                class="pill-btn"
+                :class="{active: monthMode==='year'}"
+                @click="setMonthMode('year')"
+            >올해 기준
+            </button>
+            <button
+                type="button"
+                class="pill-btn"
+                :class="{active: monthMode==='last12'}"
+                @click="setMonthMode('last12')"
+                :aria-selected="monthMode==='last12'"
+            >최근 12개월
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="chart-box" id="monthlyChart" ref="monthlyChart">
+        <MonthlyWatchedChart
+            :userMovies="watchedMovies"
+            :monthsBack="monthMode==='last12' ? 12 : 0"
+            :yearMode="monthMode==='year'"
+            :height="0"
+            :renderSig="renderSig"
+        />
+      </div>
     </section>
 
     <!-- 장르 분포 -->
@@ -98,15 +116,16 @@
 </template>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-facing-decorator';
+import {Component, Vue, Watch} from 'vue-facing-decorator';
 import type {UserMovie} from "@/types/user-movie.ts";
 import {getUserMoviesByStatus} from "@/services/userMovieStore.ts";
 import {getGenreMap, genreNameById} from '@/stores/genre-cache';
+import MonthlyWatchedChart from "@/components/charts/MonthlyWatchedChart.vue";
 
 type PeriodKey = '30d' | '3m' | '6m' | 'all';
+type MonthMode = 'year' | 'last12';
 
 type StatsMovie = UserMovie & {
-  // Stats에서 쓰기 편하게 optional 처리(원래 타입이 더 엄격하면 여기서 완화)
   watchedAt?: string | null;
   rating?: number | null;
   genres?: number[];
@@ -115,16 +134,36 @@ type StatsMovie = UserMovie & {
 type RatingRow = { star: number; count: number; percent: number };
 type GenreRow = { name: string; count: number };
 
-@Component
+@Component(
+    {
+      name: 'StatsPage',
+      components: {MonthlyWatchedChart},
+    }
+)
 class StatsPage extends Vue {
   period: PeriodKey = '30d';
+  monthMode: MonthMode = 'last12';
 
   private watchedMoviesCache: StatsMovie[] = [];
   private genreMap: Record<number, string> = {};
+  renderSig = '';
 
   async mounted() {
     await this.loadGenreMap();
     await this.loadWatchedMovies();
+    this.renderSig = `${Date.now()}`;
+  }
+
+  setMonthMode(mode: MonthMode) {
+    if (this.monthMode === mode) return;
+    this.monthMode = mode;
+    this.renderSig = `${Date.now()}`; // ✅ 토글 바뀌면 애니메이션 재생
+  }
+
+  @Watch('period')
+  onPeriodChange() {
+    // period 바뀔 때 차트 애니메이션 다시 재생
+    this.renderSig = `${Date.now()}`;
   }
 
   async loadGenreMap() {
@@ -146,7 +185,7 @@ class StatsPage extends Vue {
     if (this.period === 'all') return list;
 
     const now = new Date();
-    const from = new Date(now);
+    const from = new Date(now.getTime());
     if (this.period === '30d') from.setDate(from.getDate() - 30);
     if (this.period === '3m') from.setMonth(from.getMonth() - 3);
     if (this.period === '6m') from.setMonth(from.getMonth() - 6);
@@ -237,3 +276,39 @@ class StatsPage extends Vue {
 
 export default StatsPage;
 </script>
+
+<style scoped>
+.pill-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(6px);
+}
+
+.pill-btn {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  color: #452829;
+  font-weight: 700;
+  padding: 8px 12px;
+  border-radius: 999px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+.pill-btn.active {
+  background: rgba(255, 255, 255, 0.92);
+  color: rgba(0, 0, 0, 0.86);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+}
+
+.pill-btn:active {
+  transform: scale(0.98);
+}
+</style>
