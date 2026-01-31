@@ -1,7 +1,7 @@
 <template>
   <section class="genre-chart">
     <div v-if="isEmpty" class="empty">아직 본 영화가 없어요 😚🎬</div>
-    <div v-else ref="chartEl" class="chart"/>
+    <div v-else ref="chartEl" class="chart"></div>
   </section>
 </template>
 
@@ -13,7 +13,7 @@ import {Prop, Ref, Watch} from 'vue-facing-decorator';
 import {buildGenreDistribution, buildGenrePieOption} from '@/utils/charts/genre-distribution';
 
 @Component({})
-export default class GenreDistributionChart extends Vue {
+class GenreDistributionChart extends Vue {
   @Prop({type: Array, default: () => []}) readonly userMovies!: any[];
   @Prop({type: Function, required: true}) readonly resolveGenreName!: (id: number) => string;
 
@@ -139,6 +139,7 @@ export default class GenreDistributionChart extends Vue {
     this.chart.setOption(option, {notMerge: true, lazyUpdate: false});
   }
 }
+export default GenreDistributionChart;
 </script>
 
 <style scoped>

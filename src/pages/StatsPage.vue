@@ -127,6 +127,7 @@ type StatsMovie = UserMovie & {
   watchedAt?: string | null;
   rating?: number | null;
   genres?: number[];
+  posterUrl?: string | null;
 };
 
 @Component(

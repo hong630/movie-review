@@ -16,7 +16,7 @@ import {Prop, Ref, Watch} from 'vue-facing-decorator';
 import {buildMonthlyWatched, buildMonthlyWatchedOption} from '@/utils/charts/monthly-watched';
 
 @Component({})
-export default class MonthlyWatchedChart extends Vue {
+class MonthlyWatchedChart extends Vue {
   @Prop({type: Array, default: () => []}) readonly userMovies!: any[];
   @Prop({type: Number, default: 0}) readonly monthsBack!: number; // 0이면 전체, 12면 최근 12개월
   @Prop({type: Boolean, default: false}) readonly yearMode!: boolean;
@@ -147,6 +147,7 @@ export default class MonthlyWatchedChart extends Vue {
     this.chart.setOption(option, {notMerge: true, lazyUpdate: false});
   }
 }
+export default MonthlyWatchedChart;
 </script>
 
 <style scoped>

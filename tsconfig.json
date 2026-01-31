@@ -10,6 +10,9 @@
       "@/*": ["src/*"]
     }
   },
+  "vueCompilerOptions": {
+    "strictTemplates": false
+  },
   "types": ["vite/client"]
 }
 
