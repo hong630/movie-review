@@ -123,6 +123,12 @@
       </article>
     </section>
   </div>
+  <ToastMessageComponent
+      v-model="toastOpen"
+      :type="toastType"
+      :message="toastMessage"
+      :duration-ms="1800"
+  />
 </template>
 
 <script lang="ts">
@@ -131,6 +137,7 @@ import {trendingMovies, searchMovies} from '@/services/tmdb.ts';
 import {toggleWatchlist, toggleWatched, getUserMovieIdSets} from "@/services/userMovieStore.ts";
 import {router} from "@/router";
 import type {UserMovieToggleResult} from '@/types/user-movie';
+import ToastMessageComponent, {ToastType} from "@/components/layout/ToastMessageComponent.vue";
 
 type TmdbMovie = {
   id: number;
@@ -142,7 +149,10 @@ type TmdbMovie = {
   genre_ids?: number[];
 };
 
-@Component({name: 'SearchPage'})
+@Component({
+  name: 'SearchPage',
+  components: {ToastMessageComponent}
+})
 class SearchPage extends Vue {
   query = '';
   movies: TmdbMovie[] = [];
@@ -150,6 +160,10 @@ class SearchPage extends Vue {
   watchlistIdSet = new Set<number>();
   watchedIdSet = new Set<number>();
   private busy = false;
+
+  toastOpen = false;
+  toastType: ToastType = 'success';
+  toastMessage = '';
 
   private debounceTimer: number | null = null;
   private page = 1;
@@ -300,25 +314,34 @@ class SearchPage extends Vue {
     return v.toFixed(1);
   }
 
+  private openToast(type: ToastType, message: string) {
+    this.toastOpen = false;
+    this.toastType = type;
+    this.toastMessage = message;
+    this.$nextTick(() => {
+      this.toastOpen = true;
+    });
+  }
+
   private toastByAction(res: UserMovieToggleResult) {
     switch (res.action) {
       case 'ADDED_TO_WATCHLIST':
-        alert('볼 영화에 추가했어요!');
+        this.openToast('success', '볼 영화에 추가했어요 🎬');
         return;
       case 'REMOVED_FROM_WATCHLIST':
-        alert('볼 영화에서 삭제했어요!');
+        this.openToast('success', '볼 영화에서 삭제했어요 🎬');
         return;
       case 'MOVED_TO_WATCHLIST':
-        alert('본 영화에서 빼고 볼 영화로 옮겼어요!');
+        this.openToast('success', '볼 영화로 옮겼어요 🎬');
         return;
       case 'ADDED_TO_WATCHED':
-        alert('본 영화에 추가했어요!');
+        this.openToast('success', '본 영화에 추가했어요 🎬');
         return;
       case 'REMOVED_FROM_WATCHED':
-        alert('본 영화에서 삭제했어요!');
+        this.openToast('success', '본 영화에서 삭제했어요 🎬');
         return;
       case 'MOVED_TO_WATCHED':
-        alert('볼 영화에서 빼고 본 영화로 옮겼어요!');
+        this.openToast('success', '본 영화로 옮겼어요 🎬');
         return;
     }
   }
@@ -336,6 +359,8 @@ class SearchPage extends Vue {
       });
       await this.refreshSaved();
       this.toastByAction(res);
+    } catch (e) {
+      this.openToast('error', '처리를 실패했어요. 다시 시도해주세요!');
     } finally {
       this.busy = false;
     }
@@ -354,6 +379,8 @@ class SearchPage extends Vue {
       });
       await this.refreshSaved();
       this.toastByAction(res);
+    } catch (e) {
+      this.openToast('error', '처리를 실패했어요. 다시 시도해주세요!');
     } finally {
       this.busy = false;
     }
