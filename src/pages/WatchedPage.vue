@@ -8,9 +8,12 @@
     </header>
 
     <section class="watched-list">
-      <p v-if="!items.length" class="list-empty">아직 본 영화가 없어요 </p>
+      <div v-if="!items.length" class="list-empty">
+        <img src="@/assets/images/nothing.gif" alt="본 영화 없음">
+        <p>본 영화가 없어요</p>
+      </div>
 
-      <article v-for="x in items" :key="x.movieId" class="watched-card">
+      <article v-for="x in items" :key="x.movieId" class="watched-card" v-else>
         <div class="watched-frame">
           <div class="watched-thumb" aria-hidden="true">
             <img v-if="posterUrl(x.posterPath)" class="movie-thumb-img" :src="posterUrl(x.posterPath)" :alt="x.title"/>

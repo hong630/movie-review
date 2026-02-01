@@ -8,9 +8,13 @@
     </header>
 
     <section class="watchlist-list">
-      <p v-if="!items.length" class="list-empty">아직 담은 영화가 없어</p>
+      <div v-if="!items.length" class="list-empty">
+        <img src="@/assets/images/nothing.gif" alt="본 영화 없음">
+        <p>아직 담은 영화가 없어요</p>
+      </div>
 
       <article
+          v-else
           v-for="x in items"
           :key="x.movieId"
           class="watchlist-card"

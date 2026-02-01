@@ -346,7 +346,8 @@ table {
     padding-bottom: 40px;
 }
 
-.watched-header{
+.watched-header,
+.watchlist-header{
     display: flex;
     justify-content: center;
     padding: 8px 0 10px;
@@ -472,7 +473,7 @@ table {
     flex-wrap: wrap;
     padding: 0 12px;
     box-sizing: border-box;
-    margin-top: 40px;
+    padding-top: 40px;
 }
 .watched-text{
     width: 100%;
@@ -585,7 +586,7 @@ table {
 }
 /* Watchlist Page */
 .page-watchlist{
-    padding: 12px 12px 0;
+    padding: 0 12px 0;
 }
 
 .watchlist-header{
@@ -637,7 +638,7 @@ table {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 12px 0 12px;
+    padding: 40px 0 12px;
 }
 
 .watchlist-card{
@@ -1094,4 +1095,23 @@ table {
     background: rgba(255, 255, 255, 0.35); /* 취소 */
     border: 1px solid #5A3E36;
     color: #5A3E36;
+}
+
+
+.list-empty{
+    width: 100%;
+    height: auto;
+}
+.list-empty img{
+    width: 60%;
+    position: relative;
+    left: 50%;
+    transform: translatex(-50%);
+}
+.list-empty p{
+    text-align: center;
+    font-weight: 700;
+    font-size: 16px;
+    margin-top: 12px;
+    font-style: italic;
 }
