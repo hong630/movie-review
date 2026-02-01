@@ -69,21 +69,34 @@
       </footer>
     </section>
     <!-- 하단 버튼 -->
-
   </div>
+  <ToastMessageComponent
+      v-model="toastOpen"
+      :type="toastType"
+      :message="toastMessage"
+      :duration-ms="1200"
+  />
 </template>
 
 <script lang="ts">
 import {Component, Vue} from 'vue-facing-decorator';
 import {getUserMovie, saveReview} from '@/services/userMovieStore';
 import {useRoute, useRouter} from "vue-router";
+import ToastMessageComponent, {ToastType} from "@/components/layout/ToastMessageComponent.vue";
 
-@Component
+@Component({
+  name: 'ReviewEditorPage',
+  components: {ToastMessageComponent}
+})
 class ReviewEditorPage extends Vue {
   private router = useRouter();
   private route = useRoute();
 
   stars = [5, 4, 3, 2, 1];
+
+  toastOpen = false;
+  toastType: ToastType = 'success';
+  toastMessage = '';
 
 
   movieId: number = 0;
@@ -91,6 +104,15 @@ class ReviewEditorPage extends Vue {
 
   rating: number | null = null;
   review: string = '';
+
+  private openToast(type: ToastType, message: string) {
+    this.toastOpen = false;
+    this.toastType = type;
+    this.toastMessage = message;
+    this.$nextTick(() => {
+      this.toastOpen = true;
+    });
+  }
 
   async mounted() {
     const id = Number((this.route.params as any).movieId);
@@ -150,17 +172,23 @@ class ReviewEditorPage extends Vue {
 
   async onSave() {
     if (!this.movieId) return;
-    await saveReview({
-      movieId: this.movieId,
-      rating: this.rating,
-      review: this.review,
-      title: this.movie?.title ?? '',
-      posterPath: this.movie?.posterPath ?? null,
-      releaseDate: this.movie?.releaseDate ?? null,
-      genres: Array.isArray(this.movie?.genres) ? this.movie.genres : [],
-    });
-    alert('저장 완료!');
-    this.router.back();
+    try {
+      await saveReview({
+        movieId: this.movieId,
+        rating: this.rating,
+        review: this.review,
+        title: this.movie?.title ?? '',
+        posterPath: this.movie?.posterPath ?? null,
+        releaseDate: this.movie?.releaseDate ?? null,
+        genres: Array.isArray(this.movie?.genres) ? this.movie.genres : [],
+      });
+      this.openToast('success', '저장을 완료했어요 🎬');
+      setTimeout(()=>{
+        this.router.back();
+      },1200)
+    } catch (e) {
+      this.openToast('error', '저장을 실패했어요.');
+    }
   }
 
   onBack() {
