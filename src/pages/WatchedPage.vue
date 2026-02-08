@@ -120,3 +120,10 @@ class WatchedPage extends Vue {
 
 export default WatchedPage;
 </script>
+<style scoped>
+@media (min-width: 610px) {
+  .watched-card{
+    width: calc(33% - 2px);
+  }
+}
+</style>

@@ -433,6 +433,7 @@ export default StatsPage;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
   font-style: italic;
   margin-left: -10px;
+  line-height: 21px;
 }
 
 /* 반짝반짝 */

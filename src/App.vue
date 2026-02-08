@@ -23,4 +23,10 @@ import BottomTabBar from '@/components/layout/BottomTabBar.vue';
 .app-main {
   padding-bottom: 64px; /* 탭바 높이 */
 }
+@media (min-width: 610px) {
+  .app-main{
+    width: 580px;
+    margin: auto;
+  }
+}
 </style>

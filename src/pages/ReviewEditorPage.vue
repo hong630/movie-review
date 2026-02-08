@@ -82,7 +82,9 @@
 import {Component, Vue} from 'vue-facing-decorator';
 import {getUserMovie, saveReview} from '@/services/userMovieStore';
 import {useRoute, useRouter} from "vue-router";
-import ToastMessageComponent, {ToastType} from "@/components/layout/ToastMessageComponent.vue";
+import ToastMessageComponent from "@/components/layout/ToastMessageComponent.vue";
+import type { ToastType } from "@/components/layout/ToastMessageComponent.vue";
+
 
 @Component({
   name: 'ReviewEditorPage',
@@ -198,3 +200,10 @@ class ReviewEditorPage extends Vue {
 
 export default ReviewEditorPage;
 </script>
+<style>
+@media (min-width: 610px) {
+  .review-textarea{
+    font-size: 14px;
+  }
+}
+</style>

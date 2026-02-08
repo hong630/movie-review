@@ -76,7 +76,7 @@ import {Component, Vue} from 'vue-facing-decorator';
 import type {UserMovie} from '@/types/user-movie';
 import {getUserMoviesByStatus, moveToWatched, removeUserMovie} from '@/services/userMovieStore';
 import {router} from "@/router";
-import ticketBg from '@/assets/images/ticket.png';
+import ticketBg from '@/assets/images/ticket.webp';
 
 @Component
 class WatchlistPage extends Vue {
@@ -263,5 +263,26 @@ export default WatchlistPage;
 }
 .watchlist-title span{
   align-self: center;
+}
+
+@media (min-width: 610px) {
+  .watchlist-list{
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .watchlist-card{
+    width: 272px;
+    height: 140px;
+  }
+  .ticket-actions .btn{
+    cursor: pointer;
+  }
+  .ticket-actions .btn span{
+    white-space: nowrap;
+  }
+  .ticket-actions .btn svg{
+    width: 22px;
+    height: 22px;
+  }
 }
 </style>

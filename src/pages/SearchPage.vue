@@ -137,7 +137,9 @@ import {trendingMovies, searchMovies} from '@/services/tmdb.ts';
 import {toggleWatchlist, toggleWatched, getUserMovieIdSets} from "@/services/userMovieStore.ts";
 import {router} from "@/router";
 import type {UserMovieToggleResult} from '@/types/user-movie';
-import ToastMessageComponent, {ToastType} from "@/components/layout/ToastMessageComponent.vue";
+import ToastMessageComponent from "@/components/layout/ToastMessageComponent.vue";
+import type { ToastType } from "@/components/layout/ToastMessageComponent.vue";
+
 
 type TmdbMovie = {
   id: number;
@@ -428,6 +430,12 @@ export default SearchPage;
 .search-icon svg {
   width: 16px;
   height: 16px;
+}
+
+@media (min-width: 610px) {
+  .search-input{
+    font-size: 14px;
+  }
 }
 
 

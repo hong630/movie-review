@@ -66,4 +66,15 @@ export default BottomTabBar;
 .tab.active{
   color: #e5e5e5;
 }
+
+@media (min-width: 610px) {
+  .tabbar{
+    width: 100px;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    justify-content: center;
+  }
+}
 </style>
