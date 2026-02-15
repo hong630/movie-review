@@ -1,10 +1,9 @@
 <template>
-  <section class="monthly-watched-chart">
-    <div v-if="isEmpty" class="empty">
-      아직 본 영화가 없어요 😚🎬
-    </div>
-
-    <div v-else ref="chartEl" class="chart"/>
+  <div v-if="isEmpty">
+    아직 본 영화가 없어요
+  </div>
+  <section v-else class="monthly-watched-chart">
+    <div  ref="chartEl" class="chart"/>
   </section>
 </template>
 

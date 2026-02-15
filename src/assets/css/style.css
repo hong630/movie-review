@@ -771,6 +771,16 @@ table {
     overflow: hidden;
 }
 
+.chart-box.empty,
+.movie-mini-empty{
+    border-radius: 12px;
+    border: none;
+    background: #F4F0E4;
+    padding: 12px;
+    box-sizing: border-box;
+    height: 100px;
+}
+
 .chart-box--pie{
     height: 300px;   /* 파이차트용 */
 }

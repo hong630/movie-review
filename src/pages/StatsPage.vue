@@ -3,7 +3,11 @@
     <!-- 상단 타이틀 -->
     <header class="stats-header">
       <h1 class="stats-title">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640"><!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M480 272C480 317.9 465.1 360.3 440 394.7L566.6 521.4C579.1 533.9 579.1 554.2 566.6 566.7C554.1 579.2 533.8 579.2 521.3 566.7L394.7 440C360.3 465.1 317.9 480 272 480C157.1 480 64 386.9 64 272C64 157.1 157.1 64 272 64C386.9 64 480 157.1 480 272zM168 280L168 344C168 357.3 178.7 368 192 368C205.3 368 216 357.3 216 344L216 280C216 266.7 205.3 256 192 256C178.7 256 168 266.7 168 280zM248 184L248 344C248 357.3 258.7 368 272 368C285.3 368 296 357.3 296 344L296 184C296 170.7 285.3 160 272 160C258.7 160 248 170.7 248 184zM328 248L328 344C328 357.3 338.7 368 352 368C365.3 368 376 357.3 376 344L376 248C376 234.7 365.3 224 352 224C338.7 224 328 234.7 328 248z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640">
+          <!--!Font Awesome Free v7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.-->
+          <path
+              d="M480 272C480 317.9 465.1 360.3 440 394.7L566.6 521.4C579.1 533.9 579.1 554.2 566.6 566.7C554.1 579.2 533.8 579.2 521.3 566.7L394.7 440C360.3 465.1 317.9 480 272 480C157.1 480 64 386.9 64 272C64 157.1 157.1 64 272 64C386.9 64 480 157.1 480 272zM168 280L168 344C168 357.3 178.7 368 192 368C205.3 368 216 357.3 216 344L216 280C216 266.7 205.3 256 192 256C178.7 256 168 266.7 168 280zM248 184L248 344C248 357.3 258.7 368 272 368C285.3 368 296 357.3 296 344L296 184C296 170.7 285.3 160 272 160C258.7 160 248 170.7 248 184zM328 248L328 344C328 357.3 338.7 368 352 368C365.3 368 376 357.3 376 344L376 248C376 234.7 365.3 224 352 224C338.7 224 328 234.7 328 248z"/>
+        </svg>
         <span>통계</span>
       </h1>
     </header>
@@ -17,7 +21,7 @@
       <div class="stats-row">
         <h3 class="stats-section-title monthly">🎬 월별 관람 수</h3>
         <!-- 월별 관람 수 기준 토글 -->
-        <div class="stats-row">
+        <div class="stats-row" v-if="hasMonthlyData">
           <div class="pill-toggle" role="tablist" aria-label="월별 관람 기준">
             <button
                 type="button"
@@ -37,7 +41,12 @@
           </div>
         </div>
       </div>
-      <div class="chart-box" id="monthlyChart" ref="monthlyChart">
+      <div
+          class="chart-box"
+          :class="{ empty: !hasMonthlyData }"
+          id="monthlyChart"
+          ref="monthlyChart"
+      >
         <MonthlyWatchedChart
             :userMovies="watchedMovies"
             :monthsBack="monthMode==='last12' ? 12 : 0"
@@ -51,7 +60,12 @@
     <!-- 장르 분포 -->
     <section class="stats-section">
       <h3 class="stats-section-title genre-percent">🎬 장르 분포</h3>
-      <div class="chart-box chart-box--pie">
+      <div
+          class="chart-box chart-box--pie"
+          :class="{ empty: !hasMonthlyData }"
+          id="monthlyChart"
+          ref="monthlyChart"
+      >
         <GenreDistributionChart
             :userMovies="watchedMovies"
             :resolveGenreName="genreNameById"
@@ -62,7 +76,7 @@
       </div>
     </section>
     <!-- 평균 평점 -->
-    <section class="stats-footer">
+    <section class="stats-footer" v-if="hasMonthlyData">
       <p class="avg-rating">
         평균 평점 <span class="star">★</span> <strong>{{ avgRatingText }}</strong>
       </p>
@@ -180,6 +194,10 @@ class StatsPage extends Vue {
 
   get watchedMovies(): StatsMovie[] {
     return this.watchedMoviesCache;
+  }
+
+  get hasMonthlyData(): boolean {
+    return Array.isArray(this.watchedMoviesCache) && this.watchedMoviesCache.length > 0;
   }
 
   get filteredWatchedMovies(): StatsMovie[] {
@@ -333,22 +351,26 @@ export default StatsPage;
   flex-direction: column;
   gap: 6px;
 }
-.movie-rate-container{
+
+.movie-rate-container {
   position: relative;
   border-radius: 8px;
   overflow: hidden;
   aspect-ratio: 390 / 297;
 }
-.movie-rate-container.worst{
+
+.movie-rate-container.worst {
   aspect-ratio: 390 / 192;
 }
-.movie-rate-container.worst .movie-mini-item--one{
+
+.movie-rate-container.worst .movie-mini-item--one {
   top: unset;
   left: unset;
   bottom: 4%;
   right: 8%;
 }
-.movie-rate-container>img{
+
+.movie-rate-container > img {
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -356,7 +378,8 @@ export default StatsPage;
   top: 0;
   left: 0;
 }
-.movie-mini-item--one{
+
+.movie-mini-item--one {
   position: absolute;
   top: 8%;
   left: 4%;
@@ -364,13 +387,16 @@ export default StatsPage;
   padding: 6px;
   border-radius: 8px;
 }
-.stats-section-title.monthly{
+
+.stats-section-title.monthly {
   margin-bottom: 4px;
 }
-.stats-top{
+
+.stats-top {
   margin-top: 28px;
 }
-.stats-header{
+
+.stats-header {
   position: fixed;
   top: 0;
   left: 0;
@@ -381,30 +407,35 @@ export default StatsPage;
   background-color: #E8E2D8;
   box-sizing: border-box;
 }
-.stats-title{
+
+.stats-title {
   display: flex;
   flex-direction: row;
   gap: 2px;
 }
-.stats-table > *{
+
+.stats-table > * {
   align-self: center;
 }
-.stats-title span{
+
+.stats-title span {
   white-space: nowrap;
   height: 22px;
   line-height: 22px;
 }
+
 .stats-title svg {
   width: 22px;
   height: 22px;
   align-self: center;
 }
+
 /* 평균 평점 영역 전체 */
-.stats-footer{
+.stats-footer {
   padding: 14px 0 8px;
 }
 
-.avg-rating{
+.avg-rating {
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -413,21 +444,20 @@ export default StatsPage;
 }
 
 /* 별 크게 + 반짝 */
-.avg-rating .star{
-  font-size: 22px;        /* 별 크게 */
+.avg-rating .star {
+  font-size: 22px; /* 별 크게 */
   line-height: 1;
   display: inline-block;
   transform: translateY(-1px);
   color: #F68537;
-  text-shadow:
-      0 0 6px rgba(255, 230, 120, 0.75),
-      0 0 14px rgba(255, 220, 100, 0.55);
+  text-shadow: 0 0 6px rgba(255, 230, 120, 0.75),
+  0 0 14px rgba(255, 220, 100, 0.55);
 
   animation: starSparkle 1.6s ease-in-out infinite;
 }
 
 /* 숫자 강조 */
-.avg-rating strong{
+.avg-rating strong {
   font-size: 18px;
   padding-left: 0;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
@@ -437,22 +467,17 @@ export default StatsPage;
 }
 
 /* 반짝반짝 */
-@keyframes starSparkle{
-  0%, 100%{
+@keyframes starSparkle {
+  0%, 100% {
     transform: translateY(-1px) scale(1);
-    filter: drop-shadow(0 0 0 rgba(255,230,120,0));
+    filter: drop-shadow(0 0 0 rgba(255, 230, 120, 0));
     opacity: 0.95;
   }
-  50%{
+  50% {
     transform: translateY(-2px) scale(1.14);
-    filter: drop-shadow(0 0 10px rgba(255,230,120,0.9));
+    filter: drop-shadow(0 0 10px rgba(255, 230, 120, 0.9));
     opacity: 1;
   }
-}
-
-/* 모션 싫어하는 사람 배려(선택) */
-@media (prefers-reduced-motion: reduce){
-  .avg-rating .star{ animation: none; }
 }
 
 @media (min-width: 610px) {
