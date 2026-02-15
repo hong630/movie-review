@@ -1,9 +1,11 @@
 import {toRaw} from 'vue';
 import localforage from 'localforage';
 import type {UserMovie, UserMovieStatus, UserMovieToggleResult} from '@/types/user-movie';
+import {checkAndUnlockBadges} from '@/services/badgeStore';
 
 const STORE_NAME = 'movie_review_app';
 const KEY = 'user_movies_v1';
+const POINT_KEY = 'movie_review_points_v1';
 
 localforage.config({
     name: STORE_NAME,
@@ -11,6 +13,19 @@ localforage.config({
 
 function nowIso() {
     return new Date().toISOString();
+}
+
+async function getPoints(): Promise<number> {
+    const raw = await localforage.getItem<any>(POINT_KEY);
+    const n = Number(raw);
+    return Number.isFinite(n) ? n : 0;
+}
+
+async function addPoint(n: number): Promise<number> {
+    const cur = await getPoints();
+    const next = cur + n;
+    await localforage.setItem(POINT_KEY, next);
+    return next;
 }
 
 function toPlain<T>(value: T): T {
@@ -221,6 +236,9 @@ export async function markWatched(input: {
 
     const list = await getAllUserMovies();
     const existing = list.find((x) => x.movieId === input.movieId);
+    const wasWatched = existing?.status === 'WATCHED';
+    const prevWatchedCount = list.filter((m) => m.status === 'WATCHED').length;
+    const nextWatchedCount = wasWatched ? prevWatchedCount : prevWatchedCount + 1;
 
     const next: UserMovie = {
         movieId: input.movieId,
@@ -241,7 +259,13 @@ export async function markWatched(input: {
         rewatchCount: existing?.rewatchCount ?? 0,
     };
 
-    return upsertUserMovie(next);
+    const saved = await upsertUserMovie(next);
+    // "처음" 본 영화로 등록되는 순간만 +1P
+    if (!wasWatched) {
+        await addPoint(1);
+        await checkAndUnlockBadges(nextWatchedCount);
+    }
+    return saved;
 }
 
 export async function toggleWatchlist(input: {
@@ -330,6 +354,7 @@ export async function moveToWatched(movieId: number): Promise<void> {
 
     const target = list[idx];
     if (!target) return;
+    const wasWatched = target.status === 'WATCHED';
     const now = nowIso();
 
     list[idx] = {
@@ -339,4 +364,11 @@ export async function moveToWatched(movieId: number): Promise<void> {
     };
 
     await setAllUserMovies(list);
+
+    // 이 경로로 WATCHED가 되는 경우도 포인트/뱃지 반영(처음만)
+    if (!wasWatched) {
+        await addPoint(1);
+        const watchedCount = list.filter((m) => m.status === 'WATCHED').length;
+        await checkAndUnlockBadges(watchedCount);
+    }
 }
