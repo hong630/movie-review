@@ -1,10 +1,8 @@
 <template>
   <div class="page-point">
     <header class="common-header">
-      <h1 class="point-title">
-        <span class="coin">
-          <PointIcon/>
-        </span>
+      <h1 class="common-title">
+        <PointIcon/>
         <span>포인트</span>
       </h1>
     </header>

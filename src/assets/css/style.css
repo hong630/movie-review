@@ -86,37 +86,6 @@ table {
       padding: 0;
   }
 
-.search-header{
-    display: flex;
-    justify-content: center;
-    padding: 8px 0 10px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    z-index: 1;
-    width: 100vw;
-    height: 40px;
-    line-height: 40px;
-    background-color: #E8E2D8;
-    box-sizing: border-box;
-}
-
-.search-title{
-    font-size: 18px;
-    font-weight: 800;
-    margin: 0;
-    display: flex;
-    flex-direction: row;
-    gap: 4px;
-}
-.search-title svg{
-    width: 20px;
-    height: 20px;
-    align-self: center;
-}
-.search-title span{
-    align-self: center;
-}
 /* Search Input */
 .search-input-wrap{
     position: relative;
@@ -219,6 +188,7 @@ table {
     display: flex;
     flex-direction: column;
     margin: 16px 0 0;
+    gap: 10px;
 }
 .search-loading svg{
     height: 50px;
@@ -345,40 +315,6 @@ table {
 /* Watched Page */
 .page-watched{
     padding-bottom: 40px;
-}
-
-.watched-header,
-.watchlist-header{
-    display: flex;
-    justify-content: center;
-    padding: 8px 0 10px;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 40px;
-    line-height: 40px;
-    z-index: 1;
-    background-color: #E8E2D8;
-    box-sizing: border-box;
-}
-.watched-title svg{
-    width: 22px;
-    height: 22px;
-    align-self: center;
-}
-
-.watched-title span{
-    align-self: center;
-}
-
-.watched-title{
-    font-size: 18px;
-    font-weight: 800;
-    margin: 0;
-    display: flex;
-    flex-direction: row;
-    gap: 2px;
 }
 
 .watched-top{
@@ -590,17 +526,6 @@ table {
     padding: 0 12px 0;
 }
 
-.watchlist-header{
-    display: flex;
-    justify-content: center;
-}
-
-.watchlist-title{
-    font-size: 18px;
-    font-weight: 800;
-    margin: 0;
-}
-
 .watchlist-top{
     border-top: 1px solid #e9e9e9;
     padding-top: 10px;
@@ -698,18 +623,6 @@ table {
 .page-stats{
     padding: 12px 12px 0;
     padding-bottom: 40px;
-}
-
-.stats-header{
-    display: flex;
-    justify-content: center;
-    padding: 8px 0 10px;
-}
-
-.stats-title{
-    font-size: 18px;
-    font-weight: 800;
-    margin: 0;
 }
 
 .stats-top{
@@ -1137,4 +1050,28 @@ table {
     z-index: 10;
     background-color: #E8E2D8;
     box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    padding: 8px 0 10px;
+}
+
+.common-title {
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+    font-size: 18px;
+    font-weight: 800;
+    margin: 0;
+}
+
+.common-title svg{
+    width: 22px;
+    height: 22px;
+    align-self: center;
+}
+
+.common-title span{
+    white-space: nowrap;
+    height: 22px;
+    line-height: 22px;
 }
