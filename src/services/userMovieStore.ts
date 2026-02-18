@@ -260,9 +260,9 @@ export async function markWatched(input: {
     };
 
     const saved = await upsertUserMovie(next);
-    // "처음" 본 영화로 등록되는 순간만 +1P
+    // "처음" 본 영화로 등록되는 순간만 +50P
     if (!wasWatched) {
-        await addPoint(1);
+        await addPoint(50);
         await checkAndUnlockBadges(nextWatchedCount);
     }
     return saved;
@@ -367,7 +367,7 @@ export async function moveToWatched(movieId: number): Promise<void> {
 
     // 이 경로로 WATCHED가 되는 경우도 포인트/뱃지 반영(처음만)
     if (!wasWatched) {
-        await addPoint(1);
+        await addPoint(50);
         const watchedCount = list.filter((m) => m.status === 'WATCHED').length;
         await checkAndUnlockBadges(watchedCount);
     }

@@ -1,8 +1,10 @@
 <template>
   <div class="page-point">
-    <header class="point-header">
+    <header class="common-header">
       <h1 class="point-title">
-        <span class="coin">🪙</span>
+        <span class="coin">
+          <PointIcon/>
+        </span>
         <span>포인트</span>
       </h1>
     </header>
@@ -55,8 +57,14 @@ import {Component, Vue} from 'vue-facing-decorator';
 import {loadUnlockedBadges} from '@/services/badgeStore';
 import type {UnlockedBadge} from '@/types/badge';
 import localforage from 'localforage';
+import PointIcon from "@/assets/icons/icon_point.svg"
 
-@Component({name: 'PointPage'})
+
+@Component(
+    {name: 'PointPage',
+      components: {PointIcon},
+    }
+)
 class PointPage extends Vue {
   points = 0;
   private storageKey = 'movie_review_points_v1';

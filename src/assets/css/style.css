@@ -1127,3 +1127,14 @@ table {
     font-style: italic;
 }
 
+.common-header{
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 40px;
+    line-height: 40px;
+    z-index: 10;
+    background-color: #E8E2D8;
+    box-sizing: border-box;
+}
