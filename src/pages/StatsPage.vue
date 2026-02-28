@@ -144,32 +144,76 @@
     <!-- 직함(업적) 탭 -->
     <div v-else>
       <section class="stats-section">
-        <h3 class="stats-section-title">🏆 나의 직함</h3>
-        <p class="title-hint">
-          본 영화 <strong>{{ watchedCount }}</strong>편 기준으로 열려요 🐹
-        </p>
 
-        <div class="ach-grid">
+
+        <div class="ach-header">
+          <h3 class="stats-section-title">🏆 업적</h3>
+          <div class="ach-count">내가 본 영화 <strong>{{ watchedCount }}</strong></div>
+        </div>
+
+        <!-- 진행중/완료 탭 (게임 느낌) -->
+        <div class="ach-subtabs" role="tablist" aria-label="업적 탭">
           <button
-              v-for="a in achievements"
+              type="button"
+              class="ach-subtab"
+              :class="{active: achTab==='progress'}"
+              @click="setAchTab('progress')"
+          >진행중
+          </button>
+          <button
+              type="button"
+              class="ach-subtab"
+              :class="{active: achTab==='done'}"
+              @click="setAchTab('done')"
+          >완료
+          </button>
+        </div>
+
+        <!-- 리스트 -->
+        <div class="ach-list">
+          <button
+              v-for="a in displayAchievements"
               :key="a.id"
               type="button"
-              class="ach-card"
-              :class="{ locked: !isUnlocked(a) }"
+              class="ach-item"
+              :class="{ locked: isLocked(a), canOpen: canClaim(a), claimed: isClaimed(a) }"
               @click="onClickAchievement(a)"
           >
-            <img class="ach-img" :src="a.imgUrl" alt="" loading="lazy"/>
-            <div class="ach-meta">
-              <div class="ach-title">{{ a.title }}</div>
-              <div class="ach-sub" v-if="isUnlocked(a)">
-                ✨ 열 수 있어요!
+            <div class="ach-left">
+              <div class="ach-badge">
+                <img :src="a.imgUrl" alt="" loading="lazy" :class="{ blurred: !isClaimed(a) }"/>
               </div>
-              <div class="ach-sub" v-else>
-                🔒 {{ remainingText(a) }}
+            </div>
+
+            <div class="ach-mid">
+              <div class="ach-row1">
+                <div class="ach-title">{{ a.title }}</div>
+                <div class="ach-tag" v-if="canClaim(a)">열 수 있어요!</div>
+                <div class="ach-tag claimed" v-else-if="isClaimed(a)">
+                  <UnlockIcon/>
+                </div>
+                <div class="ach-tag locked" v-else>
+                  <LockIcon/>
+                </div>
+              </div>
+
+              <div class="ach-row2">
+                <span class="ach-desc" v-if="isLocked(a)">{{ remainingText(a) }}</span>
+                <span class="ach-desc" v-else-if="canClaim(a)">클릭해서 직함 해금하기 ✨</span>
+                <span class="ach-desc" v-else-if="isClaimed(a)">{{ a.subTitle }}</span>
+              </div>
+
+              <div class="ach-progress">
+                <div class="ach-bar">
+                  <div class="ach-fill" :style="{ width: progressPct(a) + '%' }"></div>
+                </div>
+                <div class="ach-num">{{ Math.min(watchedCount, a.threshold) }} / {{ a.threshold }}</div>
               </div>
             </div>
           </button>
         </div>
+
+
       </section>
 
       <!-- 업적 모달 -->
@@ -202,7 +246,9 @@ import GenreDistributionChart from "@/components/charts/GenreDistributionChart.v
 import StatIcon from "@/assets/icons/icon_stat.svg"
 import type {AchievementDef} from "@/stores/achievements.ts";
 import {ACHIEVEMENTS} from "@/stores/achievements.ts";
-
+import localforage from "localforage";
+import UnlockIcon from "@/assets/icons/icon_unlock.svg"
+import LockIcon from "@/assets/icons/icon_lock.svg"
 
 type PeriodKey = '30d' | '3m' | '6m' | 'all';
 type MonthMode = 'year' | 'last12';
@@ -215,11 +261,12 @@ type StatsMovie = UserMovie & {
 };
 
 type StatsTab = 'stats' | 'titles';
+type AchTab = 'progress' | 'done';
 
 @Component(
     {
       name: 'StatsPage',
-      components: {MonthlyWatchedChart, GenreDistributionChart, StatIcon},
+      components: {MonthlyWatchedChart, GenreDistributionChart, StatIcon, UnlockIcon, LockIcon},
     }
 )
 class StatsPage extends Vue {
@@ -233,12 +280,26 @@ class StatsPage extends Vue {
   genreRenderSig = '';
   selectedAchievement: AchievementDef | null = null;
   sparkleOn = false;
+  achTab: AchTab = 'progress';
+  private claimedIds: Set<string> = new Set();
+  private readonly CLAIMED_KEY = 'movie_review_achievement_claimed_v1';
 
   async mounted() {
+    await this.loadClaimed();
     await this.loadGenreMap();
     await this.loadWatchedMovies();
     this.renderSig = `${Date.now()}`;
     this.genreRenderSig = `${Date.now()}`;
+  }
+
+  async loadClaimed() {
+    const raw = await localforage.getItem(this.CLAIMED_KEY);
+    const arr = Array.isArray(raw) ? raw : [];
+    this.claimedIds = new Set(arr.map(v => String(v)));
+  }
+
+  async saveClaimed() {
+    await localforage.setItem(this.CLAIMED_KEY, Array.from(this.claimedIds));
   }
 
   setActiveTab(tab: StatsTab) {
@@ -285,9 +346,41 @@ class StatsPage extends Vue {
     return ACHIEVEMENTS;
   }
 
+  setAchTab(tab: AchTab) {
+    if (this.achTab === tab) return;
+    this.achTab = tab;
+  }
+
+  get displayAchievements(): AchievementDef[] {
+    const list = this.achievements || [];
+    if (this.achTab === 'done') {
+      return list.filter(a => this.isClaimed(a));
+    }
+    return list; // 진행중은 전체 보여주되, 열 수 있음/잠김 상태로 표현
+  }
+
+  progressPct(a: AchievementDef): number {
+    if (!a || !a.threshold) return 0;
+    const v = Math.min(this.watchedCount, a.threshold);
+    return Math.max(0, Math.min(100, Math.round((v / a.threshold) * 100)));
+  }
+
   isUnlocked(a: AchievementDef): boolean {
-    // "일치하면 열 수 있음"은 보통 누적 달성으로 처리하는 게 UX 좋음(놓치지 않게)
     return this.watchedCount >= a.threshold;
+  }
+
+  isClaimed(a: AchievementDef): boolean {
+    return !!a?.id && this.claimedIds.has(String(a.id));
+  }
+
+  canClaim(a: AchievementDef): boolean {
+    // 달성했고, 아직 해금 안 한 상태
+    return this.isUnlocked(a) && !this.isClaimed(a);
+  }
+
+  isLocked(a: AchievementDef): boolean {
+    // 달성 전이거나, 달성했어도 해금 전이면(이미지 블러 유지용)
+    return !this.isClaimed(a);
   }
 
   remainingText(a: AchievementDef): string {
@@ -296,9 +389,16 @@ class StatsPage extends Vue {
   }
 
   onClickAchievement(a: AchievementDef) {
-    if (!this.isUnlocked(a)) return;
+    if (!this.isUnlocked(a)) return; // 달성 전 클릭 막기
+
+    // 달성했는데 아직 해금 전 -> 해금 처리 + 반짝
+    if (!this.isClaimed(a)) {
+      this.claimedIds.add(String(a.id));
+      this.saveClaimed();
+      this.playSparkle();
+    }
+
     this.selectedAchievement = a;
-    this.playSparkle();
   }
 
   closeAchievementModal() {
@@ -443,39 +543,204 @@ export default StatsPage;
   font-weight: 700;
 }
 
-.ach-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+/* 업적 헤더 */
+.ach-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
-.ach-card {
+.ach-count {
+  font-weight: 900;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 12px;
+}
+
+/* 진행중/완료 탭 */
+.ach-subtabs {
   display: flex;
-  gap: 10px;
-  align-items: center;
-  text-align: left;
-  padding: 10px;
-  border-radius: 14px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: rgba(255, 255, 255, 0.75);
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+
+.ach-subtab {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(255, 255, 255, 0.65);
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-weight: 900;
   cursor: pointer;
 }
 
-.ach-card.locked {
-  cursor: not-allowed;
+.ach-subtab.active {
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
 }
 
-.ach-img {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
+/* 업적 리스트(게임 느낌) */
+.ach-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ach-item {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  padding: 10px 10px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.72));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  position: relative;
+}
+
+.ach-item.locked {
+  opacity: 0.78;
+}
+
+.ach-item.locked .ach-badge img {
+  filter: blur(2px) grayscale(0.85);
+  opacity: 0.6;
+}
+
+.ach-item.canOpen {
+  border-color: rgba(246, 133, 55, 0.35);
+}
+
+.ach-left {
+  display: flex;
+  align-items: center;
+}
+
+.ach-badge {
+  width: 80px;
+  height: 80px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
+.ach-badge img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
-.ach-card.locked .ach-img {
-  filter: blur(2px) grayscale(0.8);
+.ach-badge img.blurred{
+  filter: blur(2px) grayscale(0.85);
   opacity: 0.6;
+  transform: scale(1.03);
 }
+
+.ach-mid {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  justify-content: space-around;
+}
+
+.ach-row1 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ach-row2 {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+}
+
+.ach-title {
+  font-weight: 1000;
+  color: rgba(0, 0, 0, 0.86);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ach-tag {
+  font-size: 11px;
+  font-weight: 1000;
+  padding: 4px 8px;
+  border-radius: 999px;
+  background: rgba(246, 133, 55, 0.14);
+  color: rgba(246, 133, 55, 0.92);
+  border: 1px solid rgba(246, 133, 55, 0.24);
+}
+
+.ach-tag.claimed,
+.ach-tag.locked{
+  width: 14px;
+  height: 14px;
+  background: transparent;
+  border: none;
+  padding: 0;
+}
+
+.ach-desc {
+  font-size: 12px;
+  font-weight: 800;
+  color: rgba(0, 0, 0, 0.58);
+  line-height: 1.5;
+  text-align: left;
+}
+
+.ach-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ach-bar {
+  flex: 1;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(0, 0, 0, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.10);
+}
+
+.ach-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(154, 210, 140, 0.9), rgba(89, 180, 255, 0.9));
+}
+
+.ach-num {
+  font-size: 11px;
+  font-weight: 900;
+  color: rgba(0, 0, 0, 0.55);
+  white-space: nowrap;
+}
+
+.ach-reward {
+  font-weight: 1000;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.62);
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.ach-stamp {
+  font-weight: 1100;
+  font-size: 12px;
+  color: rgba(85, 150, 95, 0.95);
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(85, 150, 95, 0.12);
+  border: 1px solid rgba(85, 150, 95, 0.25);
+}
+
 
 .ach-meta {
   display: flex;
