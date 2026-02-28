@@ -131,7 +131,7 @@ export default WatchlistPage;
   gap: 12px;
 }
 
-/* 🎟️ 티켓 카드 배경 */
+/* 티켓 카드 배경 */
 .watchlist-card{
   position: relative;
   width: 100%;
@@ -246,7 +246,7 @@ export default WatchlistPage;
 .ticket-actions .btn span{
   align-self: center;
 }
-/* 삭제 버튼만 살짝 경고 */
+
 .btn-danger{
   border-color: rgba(160,60,60,0.6);
   color: rgba(160,60,60,0.9);
