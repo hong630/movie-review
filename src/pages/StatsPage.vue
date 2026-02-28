@@ -4,34 +4,32 @@
     <header class="common-header">
       <h1 class="common-title">
         <StatIcon/>
-        <span>통계</span>
+        <span>기록</span>
       </h1>
     </header>
 
-    <section class="stats-top">
-      <h2 class="stats-subtitle">나의 관람 통계</h2>
-    </section>
-
     <!-- 탭 -->
     <section class="stats-tabs">
-      <div class="pill-toggle" role="tablist" aria-label="통계/직함 탭">
+      <div class="top-tabs" role="tablist" aria-label="통계/업적 탭">
         <button
             type="button"
-            class="pill-btn"
+            class="top-tab"
             :class="{active: activeTab==='stats'}"
             @click="setActiveTab('stats')"
         >통계
         </button>
         <button
             type="button"
-            class="pill-btn"
+            class="top-tab"
             :class="{active: activeTab==='titles'}"
             @click="setActiveTab('titles')"
-        >직함
+        >업적
         </button>
+        <!-- underline indicator -->
+        <span class="top-tabs-indicator" :class="{ right: activeTab==='titles' }" aria-hidden="true"></span>
       </div>
     </section>
-    <div v-if="activeTab==='stats'">
+    <div class="chart-tab" v-if="activeTab==='stats'">
       <!-- 월별 관람 수 -->
       <section class="stats-section">
         <div class="stats-row">
@@ -141,18 +139,22 @@
       </section>
     </div>
 
-    <!-- 직함(업적) 탭 -->
-    <div v-else>
+    <!-- 업적 탭 -->
+    <div class="ach-tab" v-else>
       <section class="stats-section">
 
 
         <div class="ach-header">
-          <h3 class="stats-section-title">🏆 업적</h3>
-          <div class="ach-count">내가 본 영화 <strong>{{ watchedCount }}</strong></div>
+          <h3 class="stats-section-title ach">
+            <FameIcon/>
+            <span>업적</span>
+          </h3>
+          <div class="ach-count">내가 본 영화 : <strong>{{ watchedCount }}편</strong></div>
         </div>
 
-        <!-- 진행중/완료 탭 (게임 느낌) -->
+        <!-- 진행중/완료 탭 -->
         <div class="ach-subtabs" role="tablist" aria-label="업적 탭">
+          <span class="ach-subtabs-indicator" :class="{ right: achTab==='done' }" aria-hidden="true"></span>
           <button
               type="button"
               class="ach-subtab"
@@ -176,7 +178,7 @@
               :key="a.id"
               type="button"
               class="ach-item"
-              :class="{ locked: isLocked(a), canOpen: canClaim(a), claimed: isClaimed(a) }"
+              :class="{ locked: isLocked(a), canOpen: canClaim(a), claimed: isClaimed(a), sparkle: isClaimed(a) }"
               @click="onClickAchievement(a)"
           >
             <div class="ach-left">
@@ -199,7 +201,7 @@
 
               <div class="ach-row2">
                 <span class="ach-desc" v-if="isLocked(a)">{{ remainingText(a) }}</span>
-                <span class="ach-desc" v-else-if="canClaim(a)">클릭해서 직함 해금하기 ✨</span>
+                <span class="ach-desc" v-else-if="canClaim(a)">업적 해금하기 ✨</span>
                 <span class="ach-desc" v-else-if="isClaimed(a)">{{ a.subTitle }}</span>
               </div>
 
@@ -218,17 +220,16 @@
 
       <!-- 업적 모달 -->
       <div v-if="isAchModalOpen" class="ach-modal-backdrop" @click="closeAchievementModal">
-        <div class="ach-modal" :class="{ sparkle: sparkleOn }" role="dialog" aria-modal="true" @click.stop>
+        <div class="ach-modal" role="dialog" aria-modal="true" @click.stop>
           <button type="button" class="ach-close" @click="closeAchievementModal">✕</button>
-          <img class="ach-modal-img" :src="selectedAchievement?.imgUrl || ''" alt=""/>
-          <div class="ach-modal-title">{{ selectedAchievement?.title }}</div>
-          <div class="ach-modal-sub">🏆 {{ selectedAchievement?.threshold }}편 달성</div>
-          <div class="sparkles" v-if="sparkleOn" aria-hidden="true">
-            <span class="sp s1">✨</span>
-            <span class="sp s2">✨</span>
-            <span class="sp s3">✨</span>
-            <span class="sp s4">✨</span>
-            <span class="sp s5">✨</span>
+
+          <div class="modal-img-container">
+            <img class="ach-modal-img" :src="selectedAchievement?.imgUrl || ''" alt=""/>
+            <img class="modal-frame" src="https://pub-8064e7cc3a73402c81d17495cac01ced.r2.dev/frame.png" alt="프레임">
+          </div>
+          <div class="modal-desc">
+            <div class="ach-modal-title">{{ selectedAchievement?.title }}</div>
+            <div class="ach-modal-sub">{{ selectedAchievement?.subTitle }}</div>
           </div>
         </div>
       </div>
@@ -249,6 +250,7 @@ import {ACHIEVEMENTS} from "@/stores/achievements.ts";
 import localforage from "localforage";
 import UnlockIcon from "@/assets/icons/icon_unlock.svg"
 import LockIcon from "@/assets/icons/icon_lock.svg"
+import FameIcon from "@/assets/icons/icon_fame.svg"
 
 type PeriodKey = '30d' | '3m' | '6m' | 'all';
 type MonthMode = 'year' | 'last12';
@@ -266,7 +268,14 @@ type AchTab = 'progress' | 'done';
 @Component(
     {
       name: 'StatsPage',
-      components: {MonthlyWatchedChart, GenreDistributionChart, StatIcon, UnlockIcon, LockIcon},
+      components: {
+        MonthlyWatchedChart,
+        GenreDistributionChart,
+        StatIcon,
+        UnlockIcon,
+        LockIcon,
+        FameIcon,
+      },
     }
 )
 class StatsPage extends Vue {
@@ -279,7 +288,6 @@ class StatsPage extends Vue {
   renderSig = '';
   genreRenderSig = '';
   selectedAchievement: AchievementDef | null = null;
-  sparkleOn = false;
   achTab: AchTab = 'progress';
   private claimedIds: Set<string> = new Set();
   private readonly CLAIMED_KEY = 'movie_review_achievement_claimed_v1';
@@ -395,7 +403,6 @@ class StatsPage extends Vue {
     if (!this.isClaimed(a)) {
       this.claimedIds.add(String(a.id));
       this.saveClaimed();
-      this.playSparkle();
     }
 
     this.selectedAchievement = a;
@@ -403,22 +410,10 @@ class StatsPage extends Vue {
 
   closeAchievementModal() {
     this.selectedAchievement = null;
-    this.sparkleOn = false;
   }
 
   get isAchModalOpen(): boolean {
     return !!this.selectedAchievement;
-  }
-
-  playSparkle() {
-    this.sparkleOn = false;
-    // nextTick 느낌으로 한 프레임 쉬고 켜야 애니메이션 확실히 탐
-    setTimeout(() => {
-      this.sparkleOn = true;
-      setTimeout(() => {
-        this.sparkleOn = false;
-      }, 1200);
-    }, 30);
   }
 
   get hasMonthlyData(): boolean {
@@ -522,7 +517,65 @@ export default StatsPage;
 .stats-tabs {
   display: flex;
   justify-content: flex-start;
-  margin: 8px 0 18px;
+  margin: 8px 0 0 0;
+  position: fixed;
+  top: 40px;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: min(580px, 100%);
+  background-color: #E8E2D8;
+  z-index: 4;
+}
+
+/* ===== 상단 탭바(이미지 느낌) ===== */
+.top-tabs {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+  padding: 10px 12px;
+  border-radius: 14px;
+}
+
+.top-tab {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  padding: 10px 0;
+  font-weight: 900;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.42);
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+}
+
+.top-tab.active {
+  color: rgba(0, 0, 0, 0.82);
+}
+
+.top-tabs-indicator {
+  position: absolute;
+  left: 12px;
+  bottom: 6px;
+  width: calc(50% - 12px);
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.72);
+  transition: transform .22s ease;
+}
+
+.top-tabs-indicator.right {
+  transform: translateX(100%);
+}
+
+/* 모바일에서 너무 눌리지 않게 */
+@media (max-width: 360px) {
+  .top-tab {
+    font-size: 12px;
+  }
 }
 
 
@@ -560,26 +613,90 @@ export default StatsPage;
 
 /* 진행중/완료 탭 */
 .ach-subtabs {
-  display: flex;
-  gap: 8px;
-  margin: 8px 0 12px;
+  width: auto;
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  margin: 10px 0 14px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
+  white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: 16px;
+}
+
+.ach-subtabs-indicator{
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 8px;
+  width: 60px; /* 버튼 2개 기준 */
+  border-radius: 18px;
+  background: #452829;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
+  transform: translateX(0);
+  transition: transform .22s cubic-bezier(.2,.9,.2,1);
+  will-change: transform;
+}
+
+.ach-subtabs-indicator.right{
+  transform: translateX(100%);
 }
 
 .ach-subtab {
-  border: 1px solid rgba(0, 0, 0, 0.12);
-  background: rgba(255, 255, 255, 0.65);
-  padding: 8px 12px;
-  border-radius: 12px;
-  font-weight: 900;
-  cursor: pointer;
+  width: 60px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  white-space: nowrap;
+  padding: 6px 12px;
+  border-radius: 18px;
+  border: none;
+  font-weight: 500;
+  font-size: 13px;
+  position: relative;
+  z-index: 1;
+  justify-content: center;
 }
 
 .ach-subtab.active {
-  background: rgba(255, 255, 255, 0.95);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
+  color: rgba(255, 255, 255, 0.96);
+  transform: scale(0.98);
 }
 
-/* 업적 리스트(게임 느낌) */
+.ach-subtab:active{
+  transform: scale(0.99);
+}
+
+.ach-item.sparkle{
+  position: relative;      /* 이거 핵심 */
+  overflow: hidden;        /* 빛줄기 카드 밖으로 안 새게 */
+}
+
+.ach-item.sparkle::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: -60%;
+  width: 60%;
+  height: 180%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 50%, rgba(255, 255, 255, 0) 100%);
+  transform: rotate(18deg);
+  animation: badgeSparkle 2.6s ease-in-out infinite;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+@keyframes badgeSparkle{
+  0%   { transform: translateX(-120%) rotate(18deg); opacity: 0; }
+  15%  { opacity: 0.55; }
+  45%  { transform: translateX(260%) rotate(18deg); opacity: 0.15; }
+  100% { transform: translateX(260%) rotate(18deg); opacity: 0; }
+}
+
+/* 업적 리스트 */
 .ach-list {
   display: flex;
   flex-direction: column;
@@ -630,7 +747,7 @@ export default StatsPage;
   object-fit: cover;
 }
 
-.ach-badge img.blurred{
+.ach-badge img.blurred {
   filter: blur(2px) grayscale(0.85);
   opacity: 0.6;
   transform: scale(1.03);
@@ -676,7 +793,7 @@ export default StatsPage;
 }
 
 .ach-tag.claimed,
-.ach-tag.locked{
+.ach-tag.locked {
   width: 14px;
   height: 14px;
   background: transparent;
@@ -703,15 +820,14 @@ export default StatsPage;
   height: 10px;
   border-radius: 999px;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.08);
-  border: 1px solid rgba(0, 0, 0, 0.10);
+  background: #F1E9E9;
 }
 
 .ach-fill {
   height: 100%;
   width: 0%;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(154, 210, 140, 0.9), rgba(89, 180, 255, 0.9));
+  background: linear-gradient(90deg, #FEEAC9 0%, #FFCDC9 55%, #FDACAC 100%);
 }
 
 .ach-num {
@@ -771,92 +887,33 @@ export default StatsPage;
   align-items: center;
   justify-content: center;
   padding: 16px;
-  z-index: 9999;
+  z-index: 10000;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .ach-modal {
-  width: min(360px, 100%);
-  background: white;
-  border-radius: 18px;
+  width: min(500px, calc(100% - 32px));
+  background: #F1E9E9;
   padding: 14px 14px 18px;
-  position: relative;
+  position: absolute;
   box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
+  top: 60px;
+  left: 50%;
+  transform: translatex(-50%);
+  box-sizing: border-box;
+  height: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-.ach-modal.sparkle {
-  animation: popSparkle 420ms ease-out;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22),
-  0 0 0 2px rgba(255, 210, 120, 0.65),
-  0 0 18px rgba(255, 210, 120, 0.55);
-}
-
-.sparkles {
+.modal-frame{
+  width: 300px;
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.sp {
-  position: absolute;
-  font-size: 20px;
-  opacity: 0;
-  animation: flySparkle 900ms ease-out forwards;
-}
-
-.sp.s1 {
-  top: 12%;
-  left: 18%;
-  animation-delay: 0ms;
-}
-
-.sp.s2 {
-  top: 18%;
-  right: 16%;
-  animation-delay: 60ms;
-}
-
-.sp.s3 {
-  bottom: 18%;
-  left: 22%;
-  animation-delay: 120ms;
-}
-
-.sp.s4 {
-  bottom: 14%;
-  right: 18%;
-  animation-delay: 180ms;
-}
-
-.sp.s5 {
-  top: 50%;
-  left: 8%;
-  animation-delay: 240ms;
-}
-
-@keyframes popSparkle {
-  0% {
-    transform: scale(0.98);
-  }
-  55% {
-    transform: scale(1.02);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-@keyframes flySparkle {
-  0% {
-    transform: translateY(6px) scale(0.9) rotate(0deg);
-    opacity: 0;
-  }
-  25% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-18px) scale(1.15) rotate(12deg);
-    opacity: 0;
-  }
+  box-sizing: border-box;
+  top: 0;
+  left: 50%;
+  transform: translatex(-50%);
 }
 
 .ach-close {
@@ -868,14 +925,26 @@ export default StatsPage;
   cursor: pointer;
   font-size: 16px;
 }
-
-.ach-modal-img {
+.modal-img-container{
+  margin-top: 20px;
   width: 100%;
+  height: 300px;
+  position: relative;
+
+}
+.ach-modal-img {
+  width: 110px;
+  position: absolute;
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 16px;
+  left: 50%;
+  transform: translatex(-50%);
+  top: 28%;
 }
-
+.modal-desc{
+  width: 100%;
+}
 .ach-modal-title {
   margin-top: 12px;
   font-weight: 1000;
@@ -887,6 +956,8 @@ export default StatsPage;
   margin-top: 6px;
   font-weight: 800;
   color: rgba(0, 0, 0, 0.62);
+  line-height: 1.5;
+  word-break: keep-all;
 }
 
 .pill-btn {
@@ -976,8 +1047,31 @@ export default StatsPage;
   margin-bottom: 4px;
 }
 
+.stats-section-title.ach {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  width: auto;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.stats-section-title.ach svg {
+  width: 24px;
+  height: 24px;
+}
+
+.stats-section:last-child {
+  border: none;
+}
+
 .stats-top {
   margin-top: 28px;
+}
+
+.ach-tab,
+.chart-tab{
+  margin-top: 66px;
 }
 
 .stats-table > * {
