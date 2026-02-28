@@ -288,6 +288,8 @@ class StatsPage extends Vue {
   renderSig = '';
   genreRenderSig = '';
   selectedAchievement: AchievementDef | null = null;
+  frameReady = false;
+  private readonly FRAME_URL = 'https://pub-8064e7cc3a73402c81d17495cac01ced.r2.dev/frame.png';
   achTab: AchTab = 'progress';
   private claimedIds: Set<string> = new Set();
   private readonly CLAIMED_KEY = 'movie_review_achievement_claimed_v1';
@@ -393,11 +395,18 @@ class StatsPage extends Vue {
 
   remainingText(a: AchievementDef): string {
     const remain = Math.max(a.threshold - this.watchedCount, 0);
-    return `${remain}편 더 보면 열 수 있어요`;
+    return remain > 0 ? `${remain}편 더 보면 열 수 있어요` : '업적 달성 완료!';
   }
 
   onClickAchievement(a: AchievementDef) {
     if (!this.isUnlocked(a)) return; // 달성 전 클릭 막기
+
+    // 모달 열기 전에 프레임 먼저 로드해서 동시에 뜨게
+    this.frameReady = false;
+    this.preloadImage(this.FRAME_URL).finally(() => {
+      this.frameReady = true;
+      this.selectedAchievement = a;
+    });
 
     // 달성했는데 아직 해금 전 -> 해금 처리 + 반짝
     if (!this.isClaimed(a)) {
@@ -405,7 +414,6 @@ class StatsPage extends Vue {
       this.saveClaimed();
     }
 
-    this.selectedAchievement = a;
   }
 
   closeAchievementModal() {
@@ -413,7 +421,20 @@ class StatsPage extends Vue {
   }
 
   get isAchModalOpen(): boolean {
-    return !!this.selectedAchievement;
+    return !!this.selectedAchievement && this.frameReady;
+  }
+
+  preloadImage(url: string) {
+    return new Promise<void>(function (resolve) {
+      const img = new Image();
+      img.onload = function () {
+        resolve();
+      };
+      img.onerror = function () {
+        resolve();
+      }; // 실패해도 막지 않기
+      img.src = url;
+    });
   }
 
   get hasMonthlyData(): boolean {
@@ -626,7 +647,7 @@ export default StatsPage;
   border-radius: 16px;
 }
 
-.ach-subtabs-indicator{
+.ach-subtabs-indicator {
   position: absolute;
   top: 4px;
   bottom: 4px;
@@ -636,11 +657,11 @@ export default StatsPage;
   background: #452829;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.18);
   transform: translateX(0);
-  transition: transform .22s cubic-bezier(.2,.9,.2,1);
+  transition: transform .22s cubic-bezier(.2, .9, .2, 1);
   will-change: transform;
 }
 
-.ach-subtabs-indicator.right{
+.ach-subtabs-indicator.right {
   transform: translateX(100%);
 }
 
@@ -666,13 +687,13 @@ export default StatsPage;
   transform: scale(0.98);
 }
 
-.ach-subtab:active{
+.ach-subtab:active {
   transform: scale(0.99);
 }
 
-.ach-item.sparkle{
-  position: relative;      /* 이거 핵심 */
-  overflow: hidden;        /* 빛줄기 카드 밖으로 안 새게 */
+.ach-item.sparkle {
+  position: relative; /* 이거 핵심 */
+  overflow: hidden; /* 빛줄기 카드 밖으로 안 새게 */
 }
 
 .ach-item.sparkle::after {
@@ -689,11 +710,22 @@ export default StatsPage;
   pointer-events: none;
 }
 
-@keyframes badgeSparkle{
-  0%   { transform: translateX(-120%) rotate(18deg); opacity: 0; }
-  15%  { opacity: 0.55; }
-  45%  { transform: translateX(260%) rotate(18deg); opacity: 0.15; }
-  100% { transform: translateX(260%) rotate(18deg); opacity: 0; }
+@keyframes badgeSparkle {
+  0% {
+    transform: translateX(-120%) rotate(18deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.55;
+  }
+  45% {
+    transform: translateX(260%) rotate(18deg);
+    opacity: 0.15;
+  }
+  100% {
+    transform: translateX(260%) rotate(18deg);
+    opacity: 0;
+  }
 }
 
 /* 업적 리스트 */
@@ -907,7 +939,7 @@ export default StatsPage;
   flex-direction: column;
 }
 
-.modal-frame{
+.modal-frame {
   width: 300px;
   position: absolute;
   box-sizing: border-box;
@@ -925,13 +957,15 @@ export default StatsPage;
   cursor: pointer;
   font-size: 16px;
 }
-.modal-img-container{
+
+.modal-img-container {
   margin-top: 20px;
   width: 100%;
   height: 300px;
   position: relative;
 
 }
+
 .ach-modal-img {
   width: 110px;
   position: absolute;
@@ -942,9 +976,11 @@ export default StatsPage;
   transform: translatex(-50%);
   top: 28%;
 }
-.modal-desc{
+
+.modal-desc {
   width: 100%;
 }
+
 .ach-modal-title {
   margin-top: 12px;
   font-weight: 1000;
@@ -1070,7 +1106,7 @@ export default StatsPage;
 }
 
 .ach-tab,
-.chart-tab{
+.chart-tab {
   margin-top: 66px;
 }
 
