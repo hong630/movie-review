@@ -10,5 +10,5 @@ export type SkinDef = {
     emoji: string;
     tier: SkinTier;
     price: number;
-    className: string;
+    imageUrl: string;
 };
