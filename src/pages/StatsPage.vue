@@ -225,7 +225,7 @@
 
           <div class="modal-img-container">
             <img class="ach-modal-img" :src="selectedAchievement?.imgUrl || ''" alt=""/>
-            <img class="modal-frame" src="https://pub-8064e7cc3a73402c81d17495cac01ced.r2.dev/frame.png" alt="프레임">
+            <img class="modal-frame" src="https://pub-8064e7cc3a73402c81d17495cac01ced.r2.dev/filmframe2.png" alt="프레임">
           </div>
           <div class="modal-desc">
             <div class="ach-modal-title">{{ selectedAchievement?.title }}</div>
@@ -967,14 +967,15 @@ export default StatsPage;
 }
 
 .ach-modal-img {
-  width: 110px;
+  width: 180px;
   position: absolute;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: 16px;
   left: 50%;
-  transform: translatex(-50%);
-  top: 28%;
+  transform: translate(-50%, -50%);
+  top: 50%;
+  z-index: 1;
+  border-radius: 0;
 }
 
 .modal-desc {
