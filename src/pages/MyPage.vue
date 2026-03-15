@@ -54,10 +54,10 @@
         </div>
       </section>
 
-      <!-- 바로가기 버튼 영역 -->
+      <!-- 기록 요약 영역 -->
       <section class="my-section">
         <div class="section-box">
-          바로가기 버튼 들어갈 자리
+          기록 바로가기 들어갈 자리
         </div>
       </section>
 
@@ -68,17 +68,10 @@
         </div>
       </section>
 
-      <!-- 업적 요약 영역 -->
+      <!-- 초기화 영역 -->
       <section class="my-section">
         <div class="section-box">
-          업적 요약 들어갈 자리
-        </div>
-      </section>
-
-      <!-- 기록 요약 영역 -->
-      <section class="my-section">
-        <div class="section-box">
-          기록 요약 들어갈 자리
+          내 정보 다 초기화하기
         </div>
       </section>
     </section>
