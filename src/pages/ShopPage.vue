@@ -1,9 +1,9 @@
 <template>
   <div class="page-shop">
-    <header class="shop-header">
-      <h1 class="shop-title">
-        <span class="bag">🛍️</span>
-        <span>스킨 상점</span>
+    <header class="common-header">
+      <h1 class="common-title">
+        <ShopIcon/>
+        <span>상점</span>
       </h1>
     </header>
 
@@ -182,8 +182,11 @@ import {
   purchaseSkin,
   resetAppliedSkin,
 } from '@/stores/skinStore.ts';
+import ShopIcon from "@/assets/icons/icon_shop.svg";
 
-@Component({name: 'ShopPage'})
+@Component({name: 'ShopPage',
+  components: {ShopIcon}
+})
 class ShopPage extends Vue {
   points = 0;
 
