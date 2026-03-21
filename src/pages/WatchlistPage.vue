@@ -8,34 +8,9 @@
     </header>
 
     <section class="watchlist-toolbar">
-      <div class="watchlist-point-card">
-        <div class="watchlist-point-label">내 포인트</div>
-        <div class="watchlist-point-value">
-          <strong>{{ points }}</strong>
-          <span>P</span>
-        </div>
-      </div>
-
-      <div class="watchlist-skin-card">
-        <div class="watchlist-skin-head">
-          <div class="watchlist-skin-title">적용중인 티켓</div>
-          <div class="watchlist-skin-name">{{ activeSkinName }}</div>
-        </div>
-
-        <div class="watchlist-skin-actions">
-          <button type="button" class="btn btn-outline" @click="openSkinPicker">
-            티켓 선택
-          </button>
-          <button
-              type="button"
-              class="btn btn-outline"
-              :disabled="!appliedTicketSkinId"
-              @click="resetTicketSkin"
-          >
-            기본으로
-          </button>
-        </div>
-      </div>
+      <button type="button" class="btn-brush" @click="openSkinPicker">
+        <BrushIcon/>
+      </button>
     </section>
 
     <section class="watchlist-list">
@@ -91,43 +66,47 @@
         </div>
       </article>
     </section>
-    <div v-if="showSkinPicker" class="modal-backdrop" @click.self="closeSkinPicker">
-      <div class="modal-card skin-picker-modal">
-        <div class="modal-title">보유한 티켓 고르기</div>
-        <div class="modal-desc">
-          배경으로 쓸 티켓을 선택해보세요 🎟️
-        </div>
+    <div v-if="showSkinPicker" class="ach-modal-backdrop" @click.self="closeSkinPicker">
+      <div class="ach-modal" role="dialog" aria-modal="true" @click.stop>
+        <button type="button" class="ach-close" @click="closeSkinPicker">✕</button>
+        <div class="ach-content-container">
+          <div class="modal-title">보유한 티켓 고르기</div>
+          <div class="modal-desc">
+            배경으로 쓸 티켓을 선택해보세요
+          </div>
 
-        <div v-if="ownedTicketSkins.length === 0" class="skin-picker-empty">
-          아직 구매한 티켓이 없어요
-        </div>
+          <div v-if="ownedTicketSkins.length === 0" class="skin-picker-empty">
+            아직 구매한 티켓이 없어요
+          </div>
 
-        <div v-else class="skin-picker-grid">
-          <button
-              v-for="skin in ownedTicketSkins"
-              :key="skin.id"
-              type="button"
-              class="skin-picker-item"
-              :class="{ active: skin.id === appliedTicketSkinId }"
-              @click="pickSkin(skin.id)"
-          >
-            <div
-                class="skin-picker-preview"
-                :style="{ backgroundImage: `url(${skin.imageUrl})` }"
-            ></div>
-            <div class="skin-picker-meta">
-              <div class="skin-picker-name">{{ skin.emoji }} {{ skin.name }}</div>
-              <div class="skin-picker-state">
-                {{ skin.id === appliedTicketSkinId ? '적용중 ✅' : '선택하기' }}
+          <div v-else class="skin-picker-grid">
+            <button
+                v-for="skin in ownedTicketSkins"
+                :key="skin.id"
+                type="button"
+                class="skin-picker-item"
+                :class="{ active: skin.id === appliedTicketSkinId }"
+                @click="pickSkin(skin.id)"
+            >
+              <div
+                  class="skin-picker-preview"
+                  :style="{ backgroundImage: `url(${skin.imageUrl})` }"
+              ></div>
+              <div class="skin-picker-meta">
+                <div class="skin-picker-name">{{ skin.emoji }} {{ skin.name }}</div>
+                <div class="skin-picker-state">
+                  <template v-if="skin.id === appliedTicketSkinId">
+                    <CheckedIcon/>
+                    <span>적용중</span>
+                  </template>
+                  <template v-else>
+                    <UnCheckedIcon/>
+                    <span>선택하기</span>
+                  </template>
+                </div>
               </div>
-            </div>
-          </button>
-        </div>
-
-        <div class="modal-actions single">
-          <button type="button" class="btn btn-outline" @click="closeSkinPicker">
-            닫기
-          </button>
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -152,7 +131,11 @@ import {
   getPoints,
   resetAppliedSkin
 } from "@/stores/skinStore.ts";
+import BrushIcon from "@/assets/icons/icon_brush.svg"
+import CheckedIcon from "@/assets/icons/icon_check_active.svg"
+import UnCheckedIcon from "@/assets/icons/icon_check_inactive.svg"
 
+const DEFAULT_TICKET_SKIN_ID = 'default-ticket-skin';
 
 @Component({
   name: 'WatchlistPage',
@@ -161,6 +144,9 @@ import {
     PlusIcon,
     ReviewIcon,
     MinusIcon,
+    BrushIcon,
+    CheckedIcon,
+    UnCheckedIcon,
   }
 })
 class WatchlistPage extends Vue {
@@ -175,6 +161,19 @@ class WatchlistPage extends Vue {
 
   async mounted() {
     await this.reloadAll();
+  }
+
+  buildDefaultTicketSkin(): SkinDef {
+    return {
+      id: DEFAULT_TICKET_SKIN_ID,
+      target: 'ticket',
+      name: '기본 티켓',
+      desc: '기본 티켓',
+      emoji: '🎟️',
+      tier: 'COMMON',
+      price: 0,
+      imageUrl: ticketBg,
+    };
   }
 
   get activeSkinName() {
@@ -200,11 +199,18 @@ class WatchlistPage extends Vue {
   }
 
   async reloadTicketSkins() {
-    this.ownedTicketSkins = await getOwnedSkinsByTarget('ticket');
+    const ownedSkins = await getOwnedSkinsByTarget('ticket');
 
     const applied = await getAppliedSkinByTarget('ticket');
-    this.appliedTicketSkinId = applied ? applied.id : null;
+    this.appliedTicketSkinId = applied ? applied.id : DEFAULT_TICKET_SKIN_ID;
     this.ticketBg = applied?.imageUrl || ticketBg;
+
+    const allSkins = [this.buildDefaultTicketSkin(), ...ownedSkins];
+    this.ownedTicketSkins = allSkins.sort((a, b) => {
+      if (a.id === this.appliedTicketSkinId) return -1;
+      if (b.id === this.appliedTicketSkinId) return 1;
+      return 0;
+    });
   }
 
   async onMoveToWatched(movieId: number) {
@@ -240,6 +246,13 @@ class WatchlistPage extends Vue {
   }
 
   async pickSkin(skinId: string) {
+    if (skinId === DEFAULT_TICKET_SKIN_ID) {
+      await resetAppliedSkin('ticket');
+      await this.reloadTicketSkins();
+      this.closeSkinPicker();
+      return;
+    }
+
     await applySkin('ticket', skinId);
     await this.reloadTicketSkins();
     this.closeSkinPicker();
@@ -255,55 +268,45 @@ export default WatchlistPage;
 </script>
 <style scoped>
 .watchlist-toolbar {
-  display: grid;
-  gap: 10px;
-  margin-bottom: 14px;
-}
-
-.watchlist-point-card,
-.watchlist-skin-card {
-  border-radius: 14px;
-  padding: 14px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
-}
-
-.watchlist-point-label,
-.watchlist-skin-title {
-  font-size: 12px;
-  font-weight: 800;
-  opacity: .7;
-}
-
-.watchlist-point-value {
   display: flex;
-  align-items: baseline;
-  gap: 6px;
-  margin-top: 8px;
+  gap: 10px;
+  position: sticky;
+  top: 50px;
+  width: calc(100% - 8px);
+  margin: auto;
+  justify-content: flex-end;
+  padding: 8px;
+  box-sizing: border-box;
+  z-index: 1;
+  border: 2px solid rgba(143, 73, 94, 0.3);
+  background-color: rgba(255, 226, 233, 0.25);
+  margin-bottom: 22px;
+}
+
+.btn-brush {
+  all: unset;
+  width: 20px;
+  height: 20px;
+  align-self: center;
+}
+
+.btn-brush svg {
+  width: 20px;
+  height: 20px;
+}
+
+.skin-picker-modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% - 16px);
+  box-sizing: border-box;
 }
 
 .watchlist-point-value strong {
   font-size: 28px;
   line-height: 1;
-}
-
-.watchlist-skin-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.watchlist-skin-name {
-  font-size: 13px;
-  font-weight: 900;
-}
-
-.watchlist-skin-actions {
-  display: flex;
-  gap: 8px;
-  margin-top: 10px;
 }
 
 .watchlist-list {
@@ -493,17 +496,16 @@ export default WatchlistPage;
 .skin-picker-item {
   appearance: none;
   width: 100%;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  background: #fff;
-  border-radius: 14px;
   padding: 10px;
   text-align: left;
   box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+  border: 2px solid rgba(143, 73, 94, 0.3);
+  background: rgba(255, 226, 233, 0.25);
 }
 
 .skin-picker-item.active {
-  outline: 2px solid rgba(0, 0, 0, 0.2);
-  outline-offset: 2px;
+  border: 2px solid rgba(143, 73, 94, 0.3);
+  background-color: rgba(143, 73, 94, 0.3);
 }
 
 .skin-picker-preview {
@@ -532,6 +534,20 @@ export default WatchlistPage;
   font-size: 12px;
   font-weight: 800;
   opacity: .7;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
+}
+
+.skin-picker-state svg {
+  width: 16px;
+  height: 16px;
+  fill: #452829;
+}
+
+.skin-picker-state span {
+  white-space: nowrap;
 }
 
 .modal-actions {

@@ -911,34 +911,6 @@ export default StatsPage;
   font-weight: 700;
 }
 
-.ach-modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.42);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-  z-index: 10000;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.ach-modal {
-  width: min(500px, calc(100% - 32px));
-  background: #F1E9E9;
-  padding: 14px 14px 18px;
-  position: absolute;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.22);
-  top: 60px;
-  left: 50%;
-  transform: translatex(-50%);
-  box-sizing: border-box;
-  height: auto;
-  display: flex;
-  flex-direction: column;
-}
-
 .modal-frame {
   width: 300px;
   position: absolute;
@@ -946,16 +918,6 @@ export default StatsPage;
   top: 0;
   left: 50%;
   transform: translatex(-50%);
-}
-
-.ach-close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  font-size: 16px;
 }
 
 .modal-img-container {
