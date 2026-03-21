@@ -30,7 +30,7 @@
           </button>
         </div>
 
-        <p class="shop-hint">본 영화 등록 1회당 +50P 🎬</p>
+        <p class="shop-hint">내 포인트는 본 영화 등록 1회당 50P씩 쌓여요!</p>
       </div>
 
       <section class="skin-section">
@@ -337,11 +337,9 @@ export default ShopPage;
 }
 
 .shop-card {
-  border-radius: 14px;
   padding: 16px;
-  background: rgba(255, 255, 255, 0.72);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.10);
+  border: 2px solid rgba(143, 73, 94, 0.3);
+  background: rgba(255, 226, 233, 0.25);
 }
 
 .shop-label {
@@ -376,6 +374,7 @@ export default ShopPage;
   margin-top: 10px;
   font-weight: 800;
   opacity: 0.7;
+  font-size: 13px;
 }
 
 /* skins */
@@ -414,8 +413,8 @@ export default ShopPage;
 }
 
 .skin-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  display: flex;
+  flex-direction: column;
   gap: 10px;
 }
 
@@ -512,12 +511,11 @@ export default ShopPage;
   width: 100%;
   appearance: none;
   border: 0;
-  border-radius: 999px;
   padding: 10px 12px;
   font-weight: 900;
   cursor: pointer;
   background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+  border-radius: 0;
 }
 
 .btn.ghost {
