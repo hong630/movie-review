@@ -599,18 +599,6 @@ export default StatsPage;
   }
 }
 
-
-.pill-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  backdrop-filter: blur(6px);
-}
-
 .title-hint {
   margin: 6px 0 14px;
   color: rgba(0, 0, 0, 0.62);
@@ -957,29 +945,6 @@ export default StatsPage;
   color: rgba(0, 0, 0, 0.62);
   line-height: 1.5;
   word-break: keep-all;
-}
-
-.pill-btn {
-  appearance: none;
-  border: 0;
-  background: transparent;
-  color: #452829;
-  font-weight: 700;
-  padding: 8px 12px;
-  border-radius: 999px;
-  line-height: 1;
-  cursor: pointer;
-  transition: background-color .18s ease, color .18s ease, transform .18s ease;
-}
-
-.pill-btn.active {
-  background: rgba(255, 255, 255, 0.92);
-  color: rgba(0, 0, 0, 0.86);
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
-}
-
-.pill-btn:active {
-  transform: scale(0.98);
 }
 
 .genre-percent {

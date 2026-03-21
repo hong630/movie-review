@@ -1,17 +1,15 @@
 <template>
   <div class="page-watchlist">
     <header class="common-header">
+      <button type="button" class="btn-brush" @click="openSkinPicker">
+        <BrushIcon/>
+        <span>SKIN</span>
+      </button>
       <h1 class="common-title">
         <BookMarkIcon/>
         <span>볼 영화</span>
       </h1>
     </header>
-
-    <section class="watchlist-toolbar">
-      <button type="button" class="btn-brush" @click="openSkinPicker">
-        <BrushIcon/>
-      </button>
-    </section>
 
     <section class="watchlist-list">
       <div v-if="!items.length" class="list-empty">
@@ -128,7 +126,6 @@ import {
   applySkin,
   getAppliedSkinByTarget,
   getOwnedSkinsByTarget,
-  getPoints,
   resetAppliedSkin
 } from "@/stores/skinStore.ts";
 import BrushIcon from "@/assets/icons/icon_brush.svg"
@@ -154,7 +151,6 @@ class WatchlistPage extends Vue {
 
   items: UserMovie[] = [];
 
-  points = 0;
   ownedTicketSkins: SkinDef[] = [];
   appliedTicketSkinId: string | null = null;
   showSkinPicker = false;
@@ -176,26 +172,15 @@ class WatchlistPage extends Vue {
     };
   }
 
-  get activeSkinName() {
-    if (!this.appliedTicketSkinId) return '기본 티켓';
-    const found = this.ownedTicketSkins.find((x) => x.id === this.appliedTicketSkinId);
-    return found ? found.name : '기본 티켓';
-  }
-
   async reloadAll() {
     await Promise.all([
       this.reload(),
-      this.reloadPoint(),
       this.reloadTicketSkins(),
     ]);
   }
 
   async reload() {
     this.items = await getUserMoviesByStatus('WATCHLIST');
-  }
-
-  async reloadPoint() {
-    this.points = await getPoints();
   }
 
   async reloadTicketSkins() {
@@ -257,11 +242,6 @@ class WatchlistPage extends Vue {
     await this.reloadTicketSkins();
     this.closeSkinPicker();
   }
-
-  async resetTicketSkin() {
-    await resetAppliedSkin('ticket');
-    await this.reloadTicketSkins();
-  }
 }
 
 export default WatchlistPage;
@@ -285,9 +265,16 @@ export default WatchlistPage;
 
 .btn-brush {
   all: unset;
-  width: 20px;
-  height: 20px;
   align-self: center;
+  position: absolute;
+  left: 10px;
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  width: auto;
+  height: 20px;
+  flex-shrink: 0;
+  padding-top: 10px;
 }
 
 .btn-brush svg {
@@ -295,13 +282,10 @@ export default WatchlistPage;
   height: 20px;
 }
 
-.skin-picker-modal {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: calc(100% - 16px);
-  box-sizing: border-box;
+.btn-brush span{
+  align-self: center;
+  font-size: 12px;
+  font-weight: 600;
 }
 
 .watchlist-point-value strong {
@@ -442,27 +426,6 @@ export default WatchlistPage;
   fill: rgba(160, 60, 60, 0.9);;
 }
 
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 30;
-  background: rgba(0, 0, 0, 0.35);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  padding: 16px;
-  box-sizing: border-box;
-}
-
-.modal-card {
-  width: 100%;
-  max-width: 520px;
-  border-radius: 18px;
-  padding: 18px;
-  background: #fffdf9;
-  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.18);
-}
-
 .modal-title {
   font-size: 18px;
   font-weight: 900;
@@ -505,7 +468,7 @@ export default WatchlistPage;
 
 .skin-picker-item.active {
   border: 2px solid rgba(143, 73, 94, 0.3);
-  background-color: rgba(143, 73, 94, 0.3);
+  background-color: rgba(143, 73, 94, 0.1);
 }
 
 .skin-picker-preview {
@@ -548,16 +511,6 @@ export default WatchlistPage;
 
 .skin-picker-state span {
   white-space: nowrap;
-}
-
-.modal-actions {
-  display: grid;
-  gap: 8px;
-  margin-top: 16px;
-}
-
-.modal-actions.single {
-  grid-template-columns: 1fr;
 }
 
 @media (min-width: 610px) {

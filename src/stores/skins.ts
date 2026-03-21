@@ -1,12 +1,23 @@
 // 스킨 카탈로그(정적 정의)
+import ticketBg from '@/assets/images/ticket.webp';
 
-import type { SkinDef, SkinTarget, SkinTier } from '@/types/skin';
+import type {SkinDef, SkinTarget, SkinTier} from '@/types/skin';
 
 export const SKIN_TARGETS: SkinTarget[] = ['ticket', 'watched'];
 
 export const SKIN_TIER_ORDER: SkinTier[] = ['COMMON', 'RARE', 'EPIC', 'LEGENDARY'];
 
 export const SKIN_DEFS: SkinDef[] = [
+    {
+        id: 'default-ticket-skin',
+        target: 'ticket',
+        name: '기본 티켓',
+        desc: '기본으로 제공되는 티켓 스킨',
+        emoji: '🎟️',
+        tier: 'COMMON',
+        price: 0,
+        imageUrl: ticketBg,
+    },
     {
         id: 'ticket_devil',
         target: 'ticket',

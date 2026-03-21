@@ -35,19 +35,45 @@
 
       <section class="skin-section">
         <div class="skin-head">
-          <h2 class="skin-title">✨ 티켓 스킨</h2>
+          <h2 class="skin-title">
+            <span class="ticket-icon">
+              <TicketIcon/>
+            </span>
+            <span>
+              티켓 스킨
+            </span>
+          </h2>
           <div class="skin-sub">
             적용중: <strong>{{ activeSkinName }}</strong>
           </div>
         </div>
 
-        <div v-if="skins.length === 0" class="skin-empty">
+        <div class="stats-row">
+          <div class="pill-toggle" role="tablist" aria-label="스킨sort">
+            <button
+                type="button"
+                class="pill-btn"
+                :class="{ active: skinFilter === 'unowned' }"
+                @click="setSkinFilter('unowned')"
+            >구매하지 않은 티켓
+            </button>
+            <button
+                type="button"
+                class="pill-btn"
+                :class="{ active: skinFilter === 'owned' }"
+                @click="setSkinFilter('owned')"
+            >구매한 티켓
+            </button>
+          </div>
+        </div>
+
+        <div v-if="filteredSkins.length === 0" class="skin-empty">
           스킨이 아직 없어요
         </div>
 
         <div v-else class="skin-grid">
           <article
-              v-for="s in skins"
+              v-for="s in filteredSkins"
               :key="s.id"
               class="skin-card"
               :class="{
@@ -61,11 +87,12 @@
                 :style="{ backgroundImage: `url(${s.imageUrl})` }"
             ></div>
             <div class="skin-top">
-              <div class="skin-emoji">{{ s.emoji }}</div>
+              <div class="skin-name">
+                <span>{{ s.emoji }}</span>
+                <span>{{ s.name }}</span>
+              </div>
               <div class="skin-tier" :data-tier="s.tier">{{ s.tier }}</div>
             </div>
-
-            <div class="skin-name">{{ s.name }}</div>
             <div v-if="s.desc" class="skin-desc">{{ s.desc }}</div>
 
             <div class="skin-meta">
@@ -100,7 +127,10 @@
                   :disabled="isActive(s.id) || applyingId === s.id"
                   @click="applySkin(s.id)"
               >
-                <span v-if="isActive(s.id)">적용중 ✅</span>
+                <span v-if="isActive(s.id)" class="applied-item">
+                  <span>적용중</span>
+                  <CheckedIcon/>
+                </span>
                 <span v-else-if="applyingId === s.id">적용중…</span>
                 <span v-else>적용하기</span>
               </button>
@@ -140,7 +170,6 @@
           </div>
         </div>
       </div>
-      +
       <div v-if="showBoughtModal && selectedSkin" class="modal-backdrop" @click.self="closeBoughtModal">
         <div class="modal-card">
           <div class="modal-title">구매 완료 ✨</div>
@@ -148,7 +177,6 @@
             {{ selectedSkin.emoji }} {{ selectedSkin.name }}
           </div>
           <div class="modal-desc">바로 watchlist 티켓으로 적용할 수 있어요!</div>
-          +
           <div class="modal-actions">
             <button type="button" class="btn ghost" @click="closeBoughtModal">
               닫기
@@ -183,14 +211,20 @@ import {
   resetAppliedSkin,
 } from '@/stores/skinStore.ts';
 import ShopIcon from "@/assets/icons/icon_shop.svg";
+import TicketIcon from "@/assets/icons/icon_ticket.svg"
+import CheckedIcon from "@/assets/icons/icon_check_active.svg"
 
-@Component({name: 'ShopPage',
-  components: {ShopIcon}
+@Component({
+  name: 'ShopPage',
+  components: {ShopIcon, TicketIcon, CheckedIcon}
 })
+
+
 class ShopPage extends Vue {
   points = 0;
 
   skins: SkinDef[] = [];
+  skinFilter: 'unowned' | 'owned' = 'unowned';
 
   ownedIds = new Set<string>();
   activeSkinId: string | null = null;
@@ -219,12 +253,35 @@ class ShopPage extends Vue {
     return getSkinDefById(this.selectedSkinId);
   }
 
+  get filteredSkins() {
+    const filtered = this.skins.filter((skin) => {
+      const owned = this.isOwned(skin.id);
+      return this.skinFilter === 'owned' ? owned : !owned;
+    });
+
+    if (this.skinFilter !== 'owned') {
+      return filtered;
+    }
+
+    return [...filtered].sort((a, b) => {
+      if (a.id === 'default-ticket-skin') return -1;
+      if (b.id === 'default-ticket-skin') return 1;
+      return 0;
+    });
+  }
+
   isOwned(id: string) {
+    if (id === 'default-ticket-skin') return true;
     return this.ownedIds.has(id);
   }
 
   isActive(id: string) {
+    if (id === 'default-ticket-skin') return !this.activeSkinId;
     return this.activeSkinId === id;
+  }
+
+  setSkinFilter(type: 'unowned' | 'owned') {
+    this.skinFilter = type;
   }
 
   async refreshAll() {
@@ -277,6 +334,12 @@ class ShopPage extends Vue {
   }
 
   async applySkin(id: string) {
+    if (id === 'default-ticket-skin') {
+      await resetAppliedSkin('ticket');
+      this.activeSkinId = null;
+      return;
+    }
+
     if (!this.ownedIds.has(id)) return;
     if (this.activeSkinId === id) return;
 
@@ -393,7 +456,10 @@ export default ShopPage;
 .skin-title {
   font-weight: 900;
   font-size: 16px;
-  color: rgba(0, 0, 0, 0.82);
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+  align-items: center;
 }
 
 .skin-sub {
@@ -421,22 +487,20 @@ export default ShopPage;
 .skin-card {
   position: relative;
   overflow: hidden;
-  border-radius: 14px;
   padding: 12px;
   background: rgba(255, 255, 255, 0.78);
   border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.10);
 }
 
 .skin-preview {
   width: 100%;
-  height: 110px;
+  height: auto;
   border-radius: 10px;
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
   margin-bottom: 10px;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  aspect-ratio: 1435 / 649;
 }
 
 .skin-card.owned {
@@ -480,6 +544,7 @@ export default ShopPage;
   font-weight: 800;
   font-size: 12px;
   opacity: 0.7;
+  line-height: 1.2;
 }
 
 .skin-meta {
@@ -546,9 +611,8 @@ export default ShopPage;
 .modal-card {
   width: 100%;
   max-width: 360px;
-  border-radius: 16px;
   padding: 18px;
-  background: #fffdf9;
+  background: #F1E9E9;
   box-shadow: 0 16px 34px rgba(0, 0, 0, 0.18);
 }
 
@@ -603,6 +667,26 @@ export default ShopPage;
   opacity: 0.55;
 }
 
+.ticket-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  padding-left: 6px;
+}
+
+.applied-item{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.applied-item svg{
+  width: 20px;
+  height: 20px;
+  fill: #452829;
+}
+
 @keyframes badgeSparkle {
   0% {
     transform: translateX(-30%) rotate(18deg);
@@ -626,7 +710,12 @@ export default ShopPage;
 
 @media (min-width: 610px) {
   .skin-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+  .skin-card{
+    width: calc(50% - 10px);
+    box-sizing: border-box;
   }
 }
 </style>
