@@ -42,6 +42,7 @@ body {
 }
 body *{
     font-family: 'JoseonGulim';
+    color: #1A1110;
 }
 ol, ul {
     list-style: none;
