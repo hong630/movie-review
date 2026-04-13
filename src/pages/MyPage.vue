@@ -56,36 +56,51 @@
 
       <!-- 기록 요약 영역 -->
       <section class="my-section">
-        <div class="section-box">
-          기록 바로가기 들어갈 자리
-        </div>
+        <button
+            type="button"
+            class="section-shortcut shortcut-stats"
+            @click="goToStats"
+        >
+          <span class="section-shortcut-badge">📊</span>
+          <span class="section-shortcut-content">
+            <strong class="section-shortcut-title">기록 바로가기</strong>
+            <span class="section-shortcut-desc">
+              내 관람 기록 통계와 업적 보러 가기
+            </span>
+          </span>
+          <span class="section-shortcut-arrow">›</span>
+        </button>
       </section>
 
       <!-- 내 스킨 영역 -->
       <section class="my-section">
-        <div class="section-box">
-          내 스킨 정보 들어갈 자리
-        </div>
-      </section>
-
-      <!-- 초기화 영역 -->
-      <section class="my-section">
-        <div class="section-box">
-          내 정보 다 초기화하기
-        </div>
+        <button
+            type="button"
+            class="section-shortcut shortcut-skin"
+            @click="goToSkinShop"
+        >
+          <span class="section-shortcut-badge">🎀</span>
+          <span class="section-shortcut-content">
+            <strong class="section-shortcut-title">내 스킨 정보</strong>
+            <span class="section-shortcut-desc">
+              구매한 스킨 정보를 보러 가기
+            </span>
+          </span>
+          <span class="section-shortcut-arrow">›</span>
+        </button>
       </section>
     </section>
   </div>
 </template>
 
 <script lang="ts">
-import {Component, Vue} from 'vue-facing-decorator';
-import type {AchievementDef} from '@/stores/achievements';
-import {ACHIEVEMENTS} from '@/stores/achievements';
+import { Component, Vue } from 'vue-facing-decorator';
+import type { AchievementDef } from '@/stores/achievements';
+import { ACHIEVEMENTS } from '@/stores/achievements';
 import localforage from 'localforage';
-import {router} from '@/router';
-import {getPoints} from "@/stores/skinStore.ts";
-import UserIcon from "@/assets/icons/icon_user.svg"
+import { router } from '@/router';
+import { getPoints } from '@/stores/skinStore.ts';
+import UserIcon from '@/assets/icons/icon_user.svg';
 
 @Component({
   name: 'MyPage',
@@ -97,7 +112,8 @@ class MyPage extends Vue {
   points = 0;
   private claimedIds: Set<string> = new Set();
   private readonly CLAIMED_KEY = 'movie_review_achievement_claimed_v1';
-  private readonly EMPTY_ACHIEVEMENT_IMAGE = 'https://placehold.co/180x180/F1E9E9/8B6B6B?text=%EC%97%85%EC%A0%81%EC%9D%B4+%EC%97%86%EC%96%B4%EC%9A%94';
+  private readonly EMPTY_ACHIEVEMENT_IMAGE =
+      'https://placehold.co/180x180/F1E9E9/8B6B6B?text=%EC%97%85%EC%A0%81%EC%9D%B4+%EC%97%86%EC%96%B4%EC%9A%94';
 
   async mounted() {
     await Promise.all([
@@ -113,9 +129,11 @@ class MyPage extends Vue {
   async loadClaimed() {
     const raw = await localforage.getItem(this.CLAIMED_KEY);
     const arr = Array.isArray(raw) ? raw : [];
-    this.claimedIds = new Set(arr.map(function (v) {
-      return String(v);
-    }));
+    this.claimedIds = new Set(
+        arr.map(function (v) {
+          return String(v);
+        }),
+    );
   }
 
   get achievements(): AchievementDef[] {
@@ -149,6 +167,14 @@ class MyPage extends Vue {
   goToShop() {
     router.push('/shop');
   }
+
+  goToStats() {
+    router.push('/stats');
+  }
+
+  goToSkinShop() {
+    router.push('/shop');
+  }
 }
 
 export default MyPage;
@@ -172,28 +198,11 @@ export default MyPage;
   width: 100%;
 }
 
-.section-box {
-  min-height: 120px;
-  border-radius: 16px;
-  padding: 16px;
-  background: rgba(255, 255, 255, 0.78);
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.08);
-  font-weight: 800;
-  color: rgba(0, 0, 0, 0.6);
-  box-sizing: border-box;
-}
-
-.section-box--hero {
-  min-height: 180px;
-}
-
 .shop-hero-card {
   position: relative;
   overflow: hidden;
   border: 2px solid rgba(153, 104, 120, 0.35);
 }
-
 
 .shop-hero-title {
   margin: 6px 6px 0;
@@ -204,7 +213,6 @@ export default MyPage;
   font-weight: 1000;
   font-size: 16px;
   color: rgba(62, 27, 37, 0.95);
-
 }
 
 .shop-hero-body {
@@ -292,6 +300,105 @@ export default MyPage;
   transform: scale(0.98);
 }
 
+.section-shortcut {
+  width: 100%;
+  min-height: 112px;
+  appearance: none;
+  border: 2px solid rgba(143, 73, 94, 0.18);
+  padding: 16px 18px;
+  background: linear-gradient(
+      180deg,
+      rgba(255, 250, 251, 0.95) 0%,
+      rgba(255, 241, 244, 0.92) 100%
+  );
+  box-shadow:
+      0 10px 20px rgba(94, 54, 67, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  text-align: left;
+  box-sizing: border-box;
+  transition:
+      transform 0.16s ease,
+      box-shadow 0.16s ease,
+      border-color 0.16s ease;
+}
+
+.section-shortcut:active {
+  transform: scale(0.985);
+}
+
+.section-shortcut-badge {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.9);
+  border: 2px solid rgba(143, 73, 94, 0.16);
+  box-shadow: 0 4px 10px rgba(94, 54, 67, 0.08);
+  font-size: 24px;
+}
+
+.section-shortcut-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.section-shortcut-title {
+  font-size: 18px;
+  font-weight: 1000;
+  color: rgba(62, 27, 37, 0.95);
+  line-height: 1.2;
+}
+
+.section-shortcut-desc {
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(82, 47, 58, 0.72);
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+.section-shortcut-arrow {
+  flex: 0 0 auto;
+  font-size: 30px;
+  font-weight: 700;
+  color: rgba(143, 73, 94, 0.4);
+  line-height: 1;
+}
+
+.shortcut-stats {
+  background: linear-gradient(
+      180deg,
+      rgba(255, 252, 252, 0.96) 0%,
+      rgba(255, 242, 244, 0.92) 100%
+  );
+}
+
+.shortcut-skin {
+  background: linear-gradient(
+      180deg,
+      rgba(255, 250, 252, 0.96) 0%,
+      rgba(255, 238, 242, 0.9) 100%
+  );
+}
+
+@media (hover: hover) {
+  .section-shortcut:hover {
+    transform: translateY(-2px);
+    border-color: rgba(143, 73, 94, 0.28);
+    box-shadow:
+        0 14px 24px rgba(94, 54, 67, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.88);
+  }
+}
+
 @media (min-width: 610px) {
   .my-body {
     max-width: 720px;
@@ -306,6 +413,31 @@ export default MyPage;
 @media (max-width: 420px) {
   .shop-hero-body {
     grid-template-columns: 1fr;
+  }
+
+  .section-shortcut {
+    min-height: 100px;
+    padding: 14px;
+    gap: 12px;
+  }
+
+  .section-shortcut-badge {
+    width: 44px;
+    height: 44px;
+    flex-basis: 44px;
+    font-size: 22px;
+  }
+
+  .section-shortcut-title {
+    font-size: 16px;
+  }
+
+  .section-shortcut-desc {
+    font-size: 12px;
+  }
+
+  .section-shortcut-arrow {
+    font-size: 26px;
   }
 }
 </style>
