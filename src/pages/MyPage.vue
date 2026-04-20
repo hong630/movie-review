@@ -119,7 +119,6 @@ class MyPage extends Vue {
   points = 0;
   private claimedIds: Set<string> = new Set();
   private readonly CLAIMED_KEY = 'movie_review_achievement_claimed_v1';
-  private readonly EMPTY_ACHIEVEMENT_IMAGE = BlankIcon;
 
   async mounted() {
     await Promise.all([

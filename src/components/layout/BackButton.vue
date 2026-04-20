@@ -20,7 +20,7 @@ import BackIcon from '@/assets/icons/icon_back.svg';
     BackIcon,
   },
 })
-export default class BackButton extends Vue {
+class BackButton extends Vue {
   @Prop({default: false})
   readonly history!: boolean;
 
@@ -36,6 +36,8 @@ export default class BackButton extends Vue {
     this.emitClick();
   }
 }
+
+export default BackButton;
 </script>
 
 <style scoped>
