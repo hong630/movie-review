@@ -160,6 +160,7 @@ export default ToastMessageComponent;
   font-size: 1.05rem;
   letter-spacing: -.4px;
   font-weight: 400;
+  color: white;
 }
 
 .toast-close {

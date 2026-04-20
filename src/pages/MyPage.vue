@@ -19,11 +19,15 @@
             <div class="shop-hero-mid">
               <div class="shop-hero-image-wrap">
                 <img
+                    v-if="hasRepresentativeAchievementImage"
                     class="shop-hero-image"
                     :src="representativeAchievementImage"
                     :alt="representativeAchievementTitle"
                     loading="lazy"
                 />
+                <div v-else class="no-data" aria-label="대표 업적 이미지 없음">
+                  <BlankIcon/>
+                </div>
               </div>
               <div class="shop-hero-detail">
                 <div class="shop-hero-row">
@@ -94,26 +98,28 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-facing-decorator';
-import type { AchievementDef } from '@/stores/achievements';
-import { ACHIEVEMENTS } from '@/stores/achievements';
+import {Component, Vue} from 'vue-facing-decorator';
+import type {AchievementDef} from '@/stores/achievements';
+import {ACHIEVEMENTS} from '@/stores/achievements';
 import localforage from 'localforage';
-import { router } from '@/router';
-import { getPoints } from '@/stores/skinStore.ts';
+import {router} from '@/router';
+import {getPoints} from '@/stores/skinStore.ts';
 import UserIcon from '@/assets/icons/icon_user.svg';
+import BlankIcon from "@/assets/icons/icon_blank.svg"
+
 
 @Component({
   name: 'MyPage',
   components: {
     UserIcon,
+    BlankIcon,
   },
 })
 class MyPage extends Vue {
   points = 0;
   private claimedIds: Set<string> = new Set();
   private readonly CLAIMED_KEY = 'movie_review_achievement_claimed_v1';
-  private readonly EMPTY_ACHIEVEMENT_IMAGE =
-      'https://placehold.co/180x180/F1E9E9/8B6B6B?text=%EC%97%85%EC%A0%81%EC%9D%B4+%EC%97%86%EC%96%B4%EC%9A%94';
+  private readonly EMPTY_ACHIEVEMENT_IMAGE = BlankIcon;
 
   async mounted() {
     await Promise.all([
@@ -153,7 +159,11 @@ class MyPage extends Vue {
   }
 
   get representativeAchievementImage(): string {
-    return this.representativeAchievement?.imgUrl || this.EMPTY_ACHIEVEMENT_IMAGE;
+    return this.representativeAchievement?.imgUrl || '';
+  }
+
+  get hasRepresentativeAchievementImage(): boolean {
+    return !!this.representativeAchievement?.imgUrl;
   }
 
   get representativeAchievementSubText(): string {
@@ -311,18 +321,16 @@ export default MyPage;
       rgba(255, 250, 251, 0.95) 0%,
       rgba(255, 241, 244, 0.92) 100%
   );
-  box-shadow:
-      0 10px 20px rgba(94, 54, 67, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  box-shadow: 0 10px 20px rgba(94, 54, 67, 0.08),
+  inset 0 1px 0 rgba(255, 255, 255, 0.85);
   display: flex;
   align-items: center;
   gap: 14px;
   text-align: left;
   box-sizing: border-box;
-  transition:
-      transform 0.16s ease,
-      box-shadow 0.16s ease,
-      border-color 0.16s ease;
+  transition: transform 0.16s ease,
+  box-shadow 0.16s ease,
+  border-color 0.16s ease;
 }
 
 .section-shortcut:active {
@@ -389,13 +397,28 @@ export default MyPage;
   );
 }
 
+.no-data {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid rgba(143, 73, 94, 0.28);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.no-data :deep(svg) {
+  width: 56px;
+  height: 56px;
+  opacity: 0.72;
+}
+
 @media (hover: hover) {
   .section-shortcut:hover {
     transform: translateY(-2px);
     border-color: rgba(143, 73, 94, 0.28);
-    box-shadow:
-        0 14px 24px rgba(94, 54, 67, 0.12),
-        inset 0 1px 0 rgba(255, 255, 255, 0.88);
+    box-shadow: 0 14px 24px rgba(94, 54, 67, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.88);
   }
 }
 
@@ -406,7 +429,7 @@ export default MyPage;
   }
 
   .shop-hero-body {
-    grid-template-columns: 160px 1fr;
+    grid-template-columns: 300px 1fr;
   }
 }
 
