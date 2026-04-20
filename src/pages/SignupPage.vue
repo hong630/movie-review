@@ -1,5 +1,8 @@
 <template>
   <div class="page-signup">
+    <div class="signup-header">
+      <BackButton @click="onClickBackButton"/>
+    </div>
     <section class="signup-wrap">
       <div class="signup-card">
         <div class="signup-step">
@@ -116,13 +119,6 @@
             <div class="signup-actions signup-actions--two">
               <button
                   type="button"
-                  class="signup-button signup-button--secondary"
-                  @click="goToPrevStep"
-              >
-                이전
-              </button>
-              <button
-                  type="button"
                   class="signup-button"
                   :disabled="!canGoToVerifyStep"
                   @click="goToVerifyStep"
@@ -147,13 +143,6 @@
 
           <div class="signup-form">
             <div class="signup-actions signup-actions--two">
-              <button
-                  type="button"
-                  class="signup-button signup-button--secondary"
-                  @click="goToPrevStep"
-              >
-                이전
-              </button>
               <button
                   type="button"
                   class="signup-button"
@@ -266,6 +255,7 @@ import {router} from '@/router';
 import CheckedIcon from "@/assets/icons/icon_check_active.svg"
 import UnCheckedIcon from "@/assets/icons/icon_check_inactive.svg"
 import HappyIcon from "@/assets/icons/icon_happy.svg"
+import BackButton from '@/components/layout/BackButton.vue';
 
 type SignupStep = 1 | 2 | 3 | 4;
 type ToastType = 'success' | 'error' | 'info';
@@ -273,6 +263,7 @@ type ToastType = 'success' | 'error' | 'info';
 @Component({
   name: 'SignupPage',
   components: {
+    BackButton,
     CheckedIcon,
     UnCheckedIcon,
     HappyIcon,
@@ -411,15 +402,13 @@ class SignupPage extends Vue {
     this.step = 3;
   }
 
-  goToPrevStep() {
-    if (this.step === 2) {
-      this.step = 1;
+  onClickBackButton() {
+    if (this.step === 1) {
+      router.go(-1);
       return;
     }
 
-    if (this.step === 3) {
-      this.step = 2;
-    }
+    this.step = (this.step - 1) as SignupStep;
   }
 
   async sendVerificationCode() {
@@ -810,7 +799,7 @@ export default SignupPage;
   margin-bottom: 18px;
 }
 
-.signup-complete-mark svg{
+.signup-complete-mark svg {
   fill: #4b2c2c;
 }
 
@@ -845,6 +834,12 @@ export default SignupPage;
 .simple-toast--info {
   background: #6b5b53;
   color: #fff;
+}
+
+.signup-header {
+  position: fixed;
+  top: 20px;
+  left: 4px;
 }
 
 @media (min-width: 610px) {

@@ -9,7 +9,7 @@
         </p>
 
         <div class="login-form">
-          <label class="login-label" for="loginId">아이디</label>
+          <label class="login-label" for="loginId">이메일 아이디</label>
           <input
               id="loginId"
               class="login-input"
@@ -20,6 +20,10 @@
               @input="onInputId"
               @keydown.enter="onSubmit"
           />
+
+          <p v-if="idErrorMessage" class="login-error">
+            {{ idErrorMessage }}
+          </p>
 
           <label class="login-label" for="loginPassword">비밀번호</label>
           <input
@@ -33,8 +37,12 @@
               @keydown.enter="onSubmit"
           />
 
-          <p v-if="errorMessage" class="login-error">
-            {{ errorMessage }}
+          <p v-if="passwordErrorMessage" class="login-error">
+            {{ passwordErrorMessage }}
+          </p>
+
+          <p v-if="submitErrorMessage" class="login-error">
+            {{ submitErrorMessage }}
           </p>
 
           <button
@@ -48,10 +56,6 @@
         </div>
 
         <div class="login-links">
-          <button type="button" class="text-link" @click="goToFindId">
-            아이디 찾기
-          </button>
-          <span class="divider">|</span>
           <button type="button" class="text-link" @click="goToFindPassword">
             비밀번호 찾기
           </button>
@@ -80,34 +84,83 @@ class LoginPage extends Vue {
   loginId = '';
   password = '';
   isSubmitting = false;
-  errorMessage = '';
+
+  idErrorMessage = '';
+  passwordErrorMessage = '';
+  submitErrorMessage = '';
 
   private readonly TEMP_LOGIN_KEY = 'movie_review_temp_login_v1';
 
+  get isEmailValid(): boolean {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.loginId.trim());
+  }
+
+  get hasPasswordMinLength(): boolean {
+    return this.password.length >= 8 && this.password.length <= 20;
+  }
+
+  get hasPasswordLetter(): boolean {
+    return /[A-Za-z]/.test(this.password);
+  }
+
+  get hasPasswordNumber(): boolean {
+    return /\d/.test(this.password);
+  }
+
+  get hasPasswordSpecial(): boolean {
+    return /[^A-Za-z\d]/.test(this.password);
+  }
+
+  get isPasswordRuleValid(): boolean {
+    return (
+        this.hasPasswordMinLength &&
+        this.hasPasswordLetter &&
+        this.hasPasswordNumber &&
+        this.hasPasswordSpecial
+    );
+  }
+
+  clearErrorMessages() {
+    this.idErrorMessage = '';
+    this.passwordErrorMessage = '';
+    this.submitErrorMessage = '';
+  }
+
   onInputId(e: Event) {
     this.loginId = (e.target as HTMLInputElement).value;
-    this.errorMessage = '';
+    this.idErrorMessage = '';
+    this.submitErrorMessage = '';
   }
 
   onInputPassword(e: Event) {
     this.password = (e.target as HTMLInputElement).value;
-    this.errorMessage = '';
+    this.passwordErrorMessage = '';
+    this.submitErrorMessage = '';
   }
 
   validateForm(): boolean {
     const trimmedId = this.loginId.trim();
+    let isValid = true;
+
+    this.clearErrorMessages();
 
     if (!trimmedId) {
-      this.errorMessage = '아이디를 입력해줘';
-      return false;
+      this.idErrorMessage = '아이디를 입력해주세요.';
+      isValid = false;
+    } else if (!this.isEmailValid) {
+      this.idErrorMessage = '이메일 형식으로 입력해주세요.';
+      isValid = false;
     }
 
     if (!this.password) {
-      this.errorMessage = '비밀번호를 입력해줘';
-      return false;
+      this.passwordErrorMessage = '비밀번호를 입력해주세요.';
+      isValid = false;
+    } else if (!this.isPasswordRuleValid) {
+      this.passwordErrorMessage = '비밀번호 형식을 다시 확인해주세요.';
+      isValid = false;
     }
 
-    return true;
+    return isValid;
   }
 
   saveTempLogin() {
@@ -119,7 +172,7 @@ class LoginPage extends Vue {
     if (!this.validateForm()) return;
 
     this.isSubmitting = true;
-    this.errorMessage = '';
+    this.submitErrorMessage = '';
 
     try {
       await new Promise(function (resolve) {
@@ -129,14 +182,10 @@ class LoginPage extends Vue {
       this.saveTempLogin();
       await router.push('/search');
     } catch (e) {
-      this.errorMessage = '로그인 처리 중 문제가 생겼어';
+      this.submitErrorMessage = '로그인 처리 중 문제가 생겼어요.';
     } finally {
       this.isSubmitting = false;
     }
-  }
-
-  goToFindId() {
-    router.push('/find-id');
   }
 
   goToFindPassword() {
@@ -226,11 +275,21 @@ export default LoginPage;
   background: rgba(255, 255, 255, 0.92);
 }
 
+.login-input:-webkit-autofill,
+.login-input:-webkit-autofill:hover,
+.login-input:-webkit-autofill:focus,
+.login-input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px rgba(255, 255, 255, 0.72) inset;
+  -webkit-text-fill-color: #6b4a4d;
+  transition: background-color 9999s ease-out 0s;
+}
+
 .login-error {
   margin: 4px 0 0;
   color: #9e3d3d;
   font-size: 12px;
   font-weight: 800;
+  padding-left: 8px;
 }
 
 .login-button {

@@ -8,7 +8,6 @@ import PointPage from '@/pages/PointPage.vue';
 import ShopPage from "@/pages/ShopPage.vue";
 import MyPage from "@/pages/MyPage.vue";
 import LoginPage from "@/pages/LoginPage.vue";
-import FindIdPage from "@/pages/FindIdPage.vue";
 import FindPasswordPage from "@/pages/FindPasswordPage.vue";
 import SignupPage from "@/pages/SignupPage.vue";
 
@@ -16,7 +15,6 @@ import SignupPage from "@/pages/SignupPage.vue";
 const routes: RouteRecordRaw[] = [
     {path: '/', redirect: '/search'},
     {path: '/login', name: 'LoginPage', component: LoginPage},
-    {path: '/find-id', name: 'FindIdPage', component: FindIdPage},
     {path: '/find-password', name: 'FindPasswordPage', component: FindPasswordPage},
     {path: '/signup', name: 'SignupPage', component: SignupPage},
     {path: '/search', component: SearchPage},
