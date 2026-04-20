@@ -1,5 +1,8 @@
 <template>
   <div class="page-login">
+    <div class="login-header">
+      <BackButton @click="goToSearch"/>
+    </div>
     <section class="login-wrap">
       <div class="login-card">
         <div class="login-title">로그인</div>
@@ -76,9 +79,11 @@
 <script lang="ts">
 import {Component, Vue} from 'vue-facing-decorator';
 import {router} from '@/router';
+import BackButton from "@/components/layout/BackButton.vue";
 
 @Component({
   name: 'LoginPage',
+  components: {BackButton},
 })
 class LoginPage extends Vue {
   loginId = '';
@@ -195,6 +200,10 @@ class LoginPage extends Vue {
   goToSignup() {
     router.push('/signup');
   }
+
+  goToSearch() {
+    router.push('/search');
+  }
 }
 
 export default LoginPage;
@@ -209,6 +218,12 @@ export default LoginPage;
   justify-content: center;
   padding: 20px 12px;
   box-sizing: border-box;
+}
+
+.login-header {
+  position: fixed;
+  top: 20px;
+  left: 4px;
 }
 
 .login-wrap {
