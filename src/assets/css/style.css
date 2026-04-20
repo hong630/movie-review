@@ -162,7 +162,7 @@ table {
 }
 
 .list-empty{
-    margin: 10px 0 0;
+    margin: 50px 0 0;
     font-size: 13px;
     color: #666;
 }
@@ -1026,12 +1026,13 @@ table {
 .list-empty{
     width: 100%;
     height: auto;
+    align-items: center;
+    display: flex;
+    flex-direction: column;
 }
-.list-empty img{
-    width: 60%;
-    position: relative;
-    left: 50%;
-    transform: translatex(-50%);
+.list-empty svg{
+    width: 40px;
+    height: 40px;
 }
 .list-empty p{
     text-align: center;

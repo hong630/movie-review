@@ -13,7 +13,7 @@
 
     <section class="watchlist-list">
       <div v-if="!items.length" class="list-empty">
-        <img src="@/assets/images/nothing.gif" alt="본 영화 없음">
+        <BlankIcon/>
         <p>아직 담은 영화가 없어요</p>
       </div>
 
@@ -131,7 +131,7 @@ import {
 import BrushIcon from "@/assets/icons/icon_brush.svg"
 import CheckedIcon from "@/assets/icons/icon_check_active.svg"
 import UnCheckedIcon from "@/assets/icons/icon_check_inactive.svg"
-
+import BlankIcon from "@/assets/icons/icon_blank.svg"
 const DEFAULT_TICKET_SKIN_ID = 'default-ticket-skin';
 
 @Component({
@@ -144,6 +144,7 @@ const DEFAULT_TICKET_SKIN_ID = 'default-ticket-skin';
     BrushIcon,
     CheckedIcon,
     UnCheckedIcon,
+    BlankIcon,
   }
 })
 class WatchlistPage extends Vue {
@@ -512,6 +513,7 @@ export default WatchlistPage;
 .skin-picker-state span {
   white-space: nowrap;
 }
+
 
 @media (min-width: 610px) {
   .watchlist-toolbar {

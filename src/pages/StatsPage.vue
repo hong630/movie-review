@@ -294,6 +294,13 @@ class StatsPage extends Vue {
   private claimedIds: Set<string> = new Set();
   private readonly CLAIMED_KEY = 'movie_review_achievement_claimed_v1';
 
+  scrollToTop() {
+    window.scrollTo({
+      top: 0,
+      behavior: 'auto',
+    });
+  }
+
   async mounted() {
     await this.loadClaimed();
     await this.loadGenreMap();
@@ -315,6 +322,9 @@ class StatsPage extends Vue {
   setActiveTab(tab: StatsTab) {
     if (this.activeTab === tab) return;
     this.activeTab = tab;
+    this.$nextTick(() => {
+      this.scrollToTop();
+    });
   }
 
   setMonthMode(mode: MonthMode) {
@@ -359,6 +369,9 @@ class StatsPage extends Vue {
   setAchTab(tab: AchTab) {
     if (this.achTab === tab) return;
     this.achTab = tab;
+    this.$nextTick(() => {
+      this.scrollToTop();
+    });
   }
 
   get displayAchievements(): AchievementDef[] {

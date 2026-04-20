@@ -9,7 +9,7 @@
 
     <section class="watched-list">
       <div v-if="!items.length" class="list-empty">
-        <img src="@/assets/images/nothing.gif" alt="본 영화 없음">
+        <BlankIcon/>
         <p>본 영화가 없어요</p>
       </div>
 
@@ -70,6 +70,7 @@ import tape4 from '@/assets/images/tape4.png';
 import WatchedIcon from "@/assets/icons/icon_watched.svg"
 import ReviewIcon from "@/assets/icons/icon_review.svg"
 import EraseIcon from "@/assets/icons/icon_erase.svg"
+import BlankIcon from "@/assets/icons/icon_blank.svg"
 
 
 @Component({
@@ -78,6 +79,7 @@ import EraseIcon from "@/assets/icons/icon_erase.svg"
     WatchedIcon,
     ReviewIcon,
     EraseIcon,
+    BlankIcon,
   }
 })
 class WatchedPage extends Vue {
